@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, GraduationCap, ArrowRight, CheckCircle, ShieldCheck, Briefcase } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 const COURSES = [
   {
@@ -114,6 +115,15 @@ const Trainings: React.FC = () => {
 
   return (
     <div className="bg-slate-50 min-h-screen pt-24 pb-16">
+      <Helmet>
+        <title>Cybersecurity & IT Training | TechDefends</title>
+        <meta name="description" content="Professional cybersecurity and IT training programs. Learn AWS, CCNA, Ethical Hacking, DevOps, and SOC with hands-on labs and 100% Placement Guarantee." />
+        <link rel="canonical" href="https://techdefends.com/trainings" />
+        <meta property="og:title" content="Cybersecurity & IT Training | TechDefends" />
+        <meta property="og:description" content="Professional cybersecurity and IT training programs. Learn AWS, CCNA, Ethical Hacking, DevOps, and SOC with hands-on labs and 100% Placement Guarantee." />
+        <meta property="og:type" content="website" />
+      </Helmet>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
@@ -126,7 +136,7 @@ const Trainings: React.FC = () => {
           </p>
         </div>
 
-        {/* Placement Support Banner */}
+        {/* 100% Placement Guarantee Banner */}
         <div className="max-w-4xl mx-auto mb-12 animate-fade-in-up delay-100">
           <div className="bg-gradient-to-br from-brand-600 to-indigo-800 rounded-3xl p-8 sm:p-10 shadow-lg text-white relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 border border-brand-500/30">
             <div className="absolute -top-10 -right-10 opacity-10 transform rotate-12">
@@ -140,9 +150,9 @@ const Trainings: React.FC = () => {
                 </div>
                 <span className="font-bold tracking-wider text-brand-100 uppercase text-sm">Career Assurance</span>
               </div>
-              <h2 className="text-2xl md:text-3xl font-extrabold mb-3 leading-tight">100% Placement Support <br className="hidden md:block"/>for Career Courses</h2>
+              <h2 className="text-2xl md:text-3xl font-extrabold mb-3 leading-tight">100% Placement Guarantee <br className="hidden md:block"/>for Career Courses</h2>
               <p className="text-brand-50 text-base md:text-lg max-w-xl opacity-90 leading-relaxed">
-                We provide placement guaranty, dedicated interview preparation, resume building, and comprehensive career support to help you land your dream tech role.
+                We provide 100% Placement Guarantee, dedicated interview preparation, resume building, and comprehensive career support to help you land your dream tech role.
               </p>
             </div>
             

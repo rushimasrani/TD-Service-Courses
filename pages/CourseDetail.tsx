@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle, Clock, ShieldCheck, Terminal, Target, HeartHandshake, Briefcase, IndianRupee, MessageSquare, Star, Quote, ChevronDown, Download, X, GitCompare, Loader2 } from 'lucide-react';
+import { trackEvent } from '../utils/analytics';
+import { ArrowRight, CheckCircle, Clock, ShieldCheck, Terminal, Target, HeartHandshake, Briefcase, IndianRupee, MessageSquare, Star, Quote, ChevronDown, Download, X, GitCompare, Loader2, AlertCircle } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 
 const TESTIMONIALS = [
   {
     name: "Aman Sharma",
     role: "SOC Analyst at TCS",
-    content: "The training was phenomenal. The hands-on labs and placement support really helped me secure my dream job.",
+    content: "The training was phenomenal. The hands-on labs and 100% Placement Guarantee really helped me secure my dream job.",
     rating: 5
   },
   {
@@ -31,8 +33,8 @@ const FAQS = [
     answer: "A basic understanding of IT concepts is helpful, but we start from the fundamentals. No prior coding experience is strictly required."
   },
   {
-    question: "Is there a placement guarantee?",
-    answer: "Yes, for our Career Courses, we offer 100% placement assistance, including mock interviews, resume building, and direct referrals."
+    question: "Is there a 100% Placement Guarantee?",
+    answer: "Yes, for our Career Courses, we offer 100% Placement Guarantee, including mock interviews, resume building, and direct referrals."
   },
   {
     question: "Do you provide hands-on labs?",
@@ -638,11 +640,52 @@ const CourseDetail: React.FC = () => {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  
+  const generateSchema = () => {
+    if (!course) return null;
+    
+    const courseSchema = {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      "name": course.title,
+      "description": course.overview,
+      "provider": {
+        "@type": "Organization",
+        "name": "TechDefends",
+        "sameAs": "https://techdefends.com"
+      }
+    };
+    
+    // Some courses might not have FAQS, so we safely handle it
+    const schemas = [courseSchema];
+    
+    if (FAQS && FAQS.length > 0) {
+        const faqSchema = {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": FAQS.map(faq => ({
+            "@type": "Question",
+            "name": faq.question,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": faq.answer
+            }
+          }))
+        };
+        schemas.push(faqSchema);
+    }
+    
+    return JSON.stringify(schemas);
+
+  };
 
   const handleInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus(null);
+    setErrorMessage('');
     
     try {
       const response = await fetch('/api/inquiry', {
@@ -653,6 +696,10 @@ const CourseDetail: React.FC = () => {
       
       if (response.ok) {
         setSubmitStatus('success');
+        trackEvent('generate_lead', {
+          lead_type: 'training_enquiry',
+          course_id: course?.title
+        });
         setFormData({ name: '', email: '', phone: '', message: '' });
         // Optionally close modal after delay
         setTimeout(() => {
@@ -660,11 +707,14 @@ const CourseDetail: React.FC = () => {
           setSubmitStatus(null);
         }, 3000);
       } else {
+        const errorData = await response.json().catch(() => ({ error: 'Network error or invalid response' }));
         setSubmitStatus('error');
+        setErrorMessage(errorData.details || errorData.error || 'Something went wrong. Please try again later.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       setSubmitStatus('error');
+      setErrorMessage(err.message || 'Something went wrong. Please try again later.');
     } finally {
       setIsSubmitting(false);
     }
@@ -714,6 +764,17 @@ const CourseDetail: React.FC = () => {
 
   return (
     <div className="bg-slate-50 min-h-screen pt-24 pb-16">
+
+      <Helmet>
+        <title>{course?.title || 'Training Program'} | TechDefends</title>
+        <meta name="description" content={course?.overview?.substring(0, 160) || ''} />
+        <link rel="canonical" href={`https://techdefends.com/courses/${slug}`} />
+        <meta property="og:title" content={`${course?.title} `} />
+        <meta property="og:description" content={course?.overview?.substring(0, 160) || ''} />
+        <meta property="og:type" content="website" />
+        {generateSchema() && <script type="application/ld+json">{generateSchema()}</script>}
+      </Helmet>
+
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 animate-fade-in-up">
         
         {/* Hero Section */}
@@ -746,7 +807,7 @@ const CourseDetail: React.FC = () => {
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 text-center">
             <div className="text-brand-500 mb-3 flex justify-center"><Briefcase size={28} /></div>
             <h4 className="text-xs uppercase tracking-wider font-bold text-slate-500 mb-1">Modules</h4>
-            <p className="text-lg font-bold text-slate-900">{course.modules.length}</p>
+            <p className="text-lg font-bold text-slate-900">{(course.modules || []).length}</p>
           </div>
         </div>
 
@@ -761,7 +822,7 @@ const CourseDetail: React.FC = () => {
                 </div>
                 <h2 className="text-3xl font-extrabold text-slate-900 mb-4 tracking-tight">Train. Certify. Get Placed.</h2>
                 <p className="text-slate-600 text-lg leading-relaxed mb-8">
-                   We provide complete career support, including resume building, mock interviews, interview preparation, career mentoring, and placement assistance to help students secure job opportunities after completing their Career Course.
+                   We provide complete career support, including resume building, mock interviews, interview preparation, career mentoring, and 100% Placement Guarantee to help students secure job opportunities after completing their Career Course.
                 </p>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -783,8 +844,8 @@ const CourseDetail: React.FC = () => {
                    </div>
                 </div>
                 
-                <button onClick={() => setIsModalOpen(true)} className="inline-flex items-center justify-center gap-2 py-4 px-8 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-xl hover:-translate-y-1">
-                   Enroll Now & Secure Your Future
+                <button onClick={() => { trackEvent('course_demo_cta', { course_id: course.id }); setIsModalOpen(true); }} className="inline-flex items-center justify-center gap-2 py-4 px-8 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-xl hover:-translate-y-1">
+                   Book Free Counseling Session
                    <ArrowRight size={18} />
                 </button>
               </div>
@@ -808,7 +869,7 @@ const CourseDetail: React.FC = () => {
         <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-slate-200">
           <h3 className="text-2xl font-bold text-slate-900 mb-8 border-b border-slate-100 pb-4">Course Highlights</h3>
           <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
-            {course.highlights.map((highlight: string, idx: number) => (
+            {(course.highlights || []).map((highlight: string, idx: number) => (
               <motion.div 
                 key={idx} 
                 initial={{ opacity: 0, y: 20 }}
@@ -828,7 +889,7 @@ const CourseDetail: React.FC = () => {
         <div>
           <h3 className="text-2xl font-bold text-slate-900 mb-8 text-center">Detailed Modules & Topics</h3>
           <div className="grid md:grid-cols-2 gap-6">
-            {course.modules.map((mod: any, idx: number) => (
+            {(course.modules || []).map((mod: any, idx: number) => (
               <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:border-brand-200 transition-colors">
                 <div className="w-10 h-10 bg-brand-50 rounded-lg flex items-center justify-center text-brand-600 font-bold mb-4">
                   {idx + 1}
@@ -846,7 +907,7 @@ const CourseDetail: React.FC = () => {
             <div className="absolute top-0 right-0 p-8 opacity-10"><Terminal size={120} /></div>
             <h3 className="text-2xl font-bold mb-6 relative z-10">Tools Covered</h3>
             <div className="flex flex-wrap gap-3 relative z-10">
-              {course.tools.map((tool: string, idx: number) => (
+              {(course.tools || []).map((tool: string, idx: number) => (
                 <span key={idx} className="px-4 py-2 bg-white/10 hover:bg-white/20 transition-colors rounded-xl text-sm font-medium border border-white/10 backdrop-blur-sm">
                   {tool}
                 </span>
@@ -857,7 +918,7 @@ const CourseDetail: React.FC = () => {
             <div className="absolute top-0 right-0 p-8 opacity-10"><Target size={120} /></div>
             <h3 className="text-2xl font-bold mb-6 relative z-10">Career Opportunities</h3>
             <ul className="space-y-3 relative z-10">
-              {course.roles.map((role: string, idx: number) => (
+              {(course.roles || []).map((role: string, idx: number) => (
                 <li key={idx} className="flex items-center gap-3">
                   <ArrowRight size={18} className="text-brand-200" />
                   <span className="font-medium text-white/90">{role}</span>
@@ -877,7 +938,7 @@ const CourseDetail: React.FC = () => {
               <h3 className="text-3xl font-bold text-slate-900">Why Choose Us?</h3>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
-              {course.whyChooseUs.map((reason: string, idx: number) => (
+              {(course.whyChooseUs || []).map((reason: string, idx: number) => (
                 <div key={idx} className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 transition-all">
                   <div className="mt-1">
                     <ShieldCheck className="text-brand-500" size={24} />
@@ -942,7 +1003,7 @@ const CourseDetail: React.FC = () => {
 
         {/* CTA */}
         <div className="text-center mt-12 pb-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-           <button onClick={() => setIsModalOpen(true)} className="inline-flex items-center justify-center gap-2 py-4 px-8 bg-brand-600 hover:bg-brand-700 text-white text-lg font-bold rounded-2xl transition-all shadow-sm shadow-brand-900/20 hover:-translate-y-1 w-full sm:w-auto">
+           <button onClick={() => { trackEvent('course_demo_cta', { course_id: course?.title }); setIsModalOpen(true); }} className="inline-flex items-center justify-center gap-2 py-4 px-8 bg-brand-600 hover:bg-brand-700 text-white text-lg font-bold rounded-2xl transition-all shadow-sm shadow-brand-900/20 hover:-translate-y-1 w-full sm:w-auto">
               Apply for Program Now
               <ArrowRight size={20} />
            </button>
@@ -1037,14 +1098,14 @@ const CourseDetail: React.FC = () => {
                         <div className="mb-6 flex-1">
                           <h5 className="font-bold text-slate-900 mb-3 border-b border-slate-200 pb-2">Key Outcomes</h5>
                           <ul className="space-y-2">
-                             {c.roles.slice(0, 4).map((role: string, i: number) => (
+                             {(c?.roles || []).slice(0, 4).map((role: string, i: number) => (
                                <li key={i} className="flex gap-2 items-start text-sm text-slate-600">
                                  <CheckCircle size={14} className="text-emerald-500 shrink-0 mt-0.5" />
                                  <span>{role}</span>
                                </li>
                              ))}
-                             {c.roles.length > 4 && (
-                               <li className="text-xs text-slate-400 italic">+{c.roles.length - 4} more roles</li>
+                             {(c?.roles || []).length > 4 && (
+                               <li className="text-xs text-slate-400 italic">+{(c?.roles || []).length - 4} more roles</li>
                              )}
                           </ul>
                         </div>
@@ -1084,7 +1145,7 @@ const CourseDetail: React.FC = () => {
             </button>
             <div className="p-8">
               <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">Request Information</h3>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Book Free Counseling Session</h3>
                 <p className="text-slate-600">Provide your contact details and our team will get back to you regarding <strong>{course.title}</strong>.</p>
               </div>
               <form className="space-y-4" onSubmit={handleInquirySubmit}>
@@ -1096,8 +1157,9 @@ const CourseDetail: React.FC = () => {
                 )}
                 
                 {submitStatus === 'error' && (
-                  <div className="bg-rose-50 text-rose-800 p-4 rounded-xl border border-rose-200 mb-4">
-                    <p className="font-medium text-sm">Something went wrong. Please try again later.</p>
+                  <div className="bg-rose-50 text-rose-800 p-4 rounded-xl border border-rose-200 mb-4 flex items-start gap-3">
+                    <AlertCircle className="shrink-0 mt-0.5 text-rose-600" size={20} />
+                    <p className="font-medium text-sm">{errorMessage}</p>
                   </div>
                 )}
 

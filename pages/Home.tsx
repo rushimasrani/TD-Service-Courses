@@ -1,11 +1,15 @@
 import React, { useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Link, useLocation } from 'react-router-dom';
+import { trackEvent } from '../utils/analytics';
 import { ArrowRight, CheckCircle, Shield, Activity, Users, Lock, ChevronRight, Clock, Award, Target } from 'lucide-react';
 import { SERVICES, MOCK_NEWS, MOCK_NEWS_POOL } from '../constants';
 import ServiceCard from '../components/ServiceCard';
 import HeroBackground from '../components/HeroBackground';
 import NewsCard from '../components/NewsCard';
 import { Reveal } from '../components/Reveal';
+import { Server, GraduationCap, FileText, LayoutGrid, ShieldCheck } from 'lucide-react';
+
 
 const Home: React.FC = () => {
   const location = useLocation();
@@ -52,6 +56,40 @@ const Home: React.FC = () => {
 
   return (
     <div className="flex flex-col">
+      <Helmet>
+        <title>Cybersecurity Company in Ahmedabad | VAPT & Managed IT Services | TechDefends</title>
+        <meta name="description" content="TechDefends is a leading cybersecurity company in Ahmedabad offering VAPT, managed IT services, and enterprise-grade security solutions for businesses. TechDefends provides robust defense strategies and network security." />
+        <link rel="canonical" href="https://www.techdefends.com/" />
+        <meta property="og:title" content="Premium Cybersecurity & Managed IT Services in Ahmedabad | TechDefends" />
+        <meta property="og:description" content="Protect your business with enterprise-grade cybersecurity, VAPT, and managed IT services." />
+        <meta property="og:url" content="https://www.techdefends.com/" />
+        <meta property="og:type" content="website" />
+
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "TechDefends",
+            "image": "https://techdefends.com/logo.png",
+            "@id": "https://techdefends.com",
+            "url": "https://techdefends.com",
+            "telephone": "+918128522079",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "64, 6th Floor, Supermall, CG Road",
+              "addressLocality": "Ahmedabad",
+              "addressRegion": "Gujarat",
+              "postalCode": "380009",
+              "addressCountry": "IN"
+            },
+            "sameAs": [
+              "https://www.linkedin.com/company/techdefends"
+            ]
+          })}
+        </script>
+
+      </Helmet>
+
       {/* Hero Section */}
       <section className="relative bg-slate-900 text-white min-h-[85vh] flex items-center overflow-hidden">
         {/* Abstract Background */}
@@ -74,28 +112,33 @@ const Home: React.FC = () => {
                 </div>
               </Reveal>
               
+              
               <Reveal delay={0.2}>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight uppercase">
-                  Secure Today, <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-600">Scale Tomorrow</span>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+                  <span className="block text-white uppercase text-3xl md:text-4xl mb-2">Cybersecurity Services</span>
+                  <span className="block text-brand-500 uppercase text-3xl md:text-4xl mb-2">Technology Solutions</span>
+                  <span className="block text-slate-300 uppercase text-3xl md:text-4xl">Professional Training</span>
                 </h1>
               </Reveal>
               
               <Reveal delay={0.3}>
                 <p className="text-lg md:text-xl text-slate-300 max-w-xl leading-relaxed">
-                  We empower businesses with proactive offensive security, robust defense strategies, and compliant managed IT services. Stay ahead of threats with TechDefends.
+                  TechDefends is your unified partner for enterprise-grade security assessments, secure infrastructure deployment, and world-class cybersecurity training.
                 </p>
               </Reveal>
+
               
               <Reveal delay={0.4}>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link 
                     to="/contact" 
+                    onClick={() => trackEvent('security_assessment_cta')}
                     className="px-8 py-4 bg-brand-600 text-white font-bold rounded-lg hover:bg-brand-700 transition-all duration-300 shadow-lg shadow-brand-900/50 flex items-center justify-center gap-2 hover:-translate-y-1"
                   >
-                    Get Free Consultation <ArrowRight size={18} />
+                    Book a Free Security Assessment <ArrowRight size={18} />
                   </Link>
                   <Link 
-                    to="/services/offensive-security" 
+                    to="/services/vapt" 
                     className="px-8 py-4 bg-transparent border border-white/20 text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-300 flex items-center justify-center hover:-translate-y-1"
                   >
                     Explore Services
@@ -106,7 +149,7 @@ const Home: React.FC = () => {
               <Reveal delay={0.5}>
                 <div className="flex items-center gap-8 pt-8 text-slate-400 text-sm font-medium">
                   <div className="flex items-center gap-2">
-                    <CheckCircle className="text-brand-500" size={20} /> ISO 27001 Certified
+                    <CheckCircle className="text-brand-500" size={20} /> Zero Trust Approach
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle className="text-brand-500" size={20} /> 24/7 SOC Support
@@ -255,6 +298,106 @@ const Home: React.FC = () => {
         </div>
       </section>
 
+      
+      {/* Security Products & Technology Solutions */}
+      <section className="py-24 bg-slate-50 border-y border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <Reveal>
+              <h2 className="text-brand-600 font-bold tracking-wide uppercase text-sm mb-3">Enterprise Solutions</h2>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <h3 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-6">Security Products & Technology Solutions</h3>
+            </Reveal>
+            <Reveal delay={0.2}>
+              <p className="text-lg text-slate-600">
+                We act as your trusted implementation partner, helping you identify requirements, source the right technologies, deploy seamlessly, and provide ongoing configuration support.
+              </p>
+            </Reveal>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <Reveal delay={0.1}>
+              <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:border-brand-500 transition-colors h-full">
+                <div className="w-14 h-14 bg-brand-50 rounded-xl flex items-center justify-center mb-6 text-brand-600">
+                  <Server size={28} />
+                </div>
+                <h4 className="text-xl font-bold mb-3">Next-Gen Firewalls & Network</h4>
+                <p className="text-slate-600 mb-6">Secure your perimeter with industry-leading NGFWs. We handle sizing, deployment, and policy configuration.</p>
+                <Link to="/services/network-security" className="text-brand-600 font-semibold hover:text-brand-700 flex items-center group">Learn More <ChevronRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" /></Link>
+              </div>
+            </Reveal>
+            <Reveal delay={0.2}>
+              <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:border-brand-500 transition-colors h-full">
+                <div className="w-14 h-14 bg-brand-50 rounded-xl flex items-center justify-center mb-6 text-brand-600">
+                  <ShieldCheck size={28} />
+                </div>
+                <h4 className="text-xl font-bold mb-3">Endpoint & Email Security</h4>
+                <p className="text-slate-600 mb-6">Protect against malware and phishing with advanced EDR and email gateways perfectly integrated into your environment.</p>
+                <Link to="/services/microsoft-365" className="text-brand-600 font-semibold hover:text-brand-700 flex items-center group">Learn More <ChevronRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" /></Link>
+              </div>
+            </Reveal>
+            <Reveal delay={0.3}>
+              <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:border-brand-500 transition-colors h-full">
+                <div className="w-14 h-14 bg-brand-50 rounded-xl flex items-center justify-center mb-6 text-brand-600">
+                  <LayoutGrid size={28} />
+                </div>
+                <h4 className="text-xl font-bold mb-3">Identity & Access Management</h4>
+                <p className="text-slate-600 mb-6">Implement Zero Trust with MFA, Single Sign-On (SSO), and secure directory integrations for your workforce.</p>
+                <Link to="/services/managed-soc" className="text-brand-600 font-semibold hover:text-brand-700 flex items-center group">Learn More <ChevronRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" /></Link>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* Professional Training Section */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <Reveal>
+                <h2 className="text-brand-600 font-bold tracking-wide uppercase text-sm mb-3">TechDefends Academy</h2>
+              </Reveal>
+              <Reveal delay={0.1}>
+                <h3 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-6">Professional Cybersecurity Training</h3>
+              </Reveal>
+              <Reveal delay={0.2}>
+                <p className="text-lg text-slate-600 mb-6">
+                  Equip yourself or your team with real-world skills. Our professional training programs are designed and delivered by active security practitioners, offering hands-on exposure to modern enterprise environments.
+                </p>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="text-brand-500 mt-1" size={20} />
+                    <span className="text-slate-700">Practical labs simulating real-world enterprise infrastructure.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="text-brand-500 mt-1" size={20} />
+                    <span className="text-slate-700">Industry-aligned curriculum updated to current threat landscapes.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="text-brand-500 mt-1" size={20} />
+                    <span className="text-slate-700">Corporate batches and individual professional tracks available.</span>
+                  </li>
+                </ul>
+              </Reveal>
+              <Reveal delay={0.3}>
+                <Link to="/trainings" className="inline-flex px-6 py-3 bg-slate-900 text-white font-bold rounded-lg hover:bg-slate-800 transition-colors">
+                  Explore Training Programs
+                </Link>
+              </Reveal>
+            </div>
+            <div className="relative">
+              <Reveal delay={0.2}>
+                <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-200">
+                  <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" alt="Professional Training" className="w-full h-auto" />
+                </div>
+              </Reveal>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
       {/* Why Choose Us */}
       <section className="py-24 bg-slate-900 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full bg-slate-800 transform skew-x-12 translate-x-20"></div>
@@ -376,10 +519,10 @@ const Home: React.FC = () => {
           </Reveal>
           <Reveal delay={0.2}>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link to="/contact" className="px-8 py-4 bg-white text-brand-700 font-bold rounded-lg hover:bg-slate-100 transition-all duration-300 shadow-lg hover:-translate-y-1">
-                Contact Sales
+              <Link to="/contact" onClick={() => trackEvent('quote_request_cta')} className="px-8 py-4 bg-white text-brand-700 font-bold rounded-lg hover:bg-slate-100 transition-all duration-300 shadow-lg hover:-translate-y-1">
+                Request a Security Quote
               </Link>
-              <Link to="/services/offensive-security" className="px-8 py-4 bg-brand-700 text-white font-bold rounded-lg hover:bg-brand-800 transition-all duration-300 shadow-lg border border-brand-500 hover:-translate-y-1">
+              <Link to="/services/vapt" className="px-8 py-4 bg-brand-700 text-white font-bold rounded-lg hover:bg-brand-800 transition-all duration-300 shadow-lg border border-brand-500 hover:-translate-y-1">
                 View All Services
               </Link>
             </div>

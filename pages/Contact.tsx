@@ -1,6 +1,8 @@
+import { useLocation } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
 import { Mail, Phone, MapPin, Send, CheckCircle, ChevronUp, AlertCircle, ShieldCheck } from 'lucide-react';
 import { COMPANY_ADDRESS, COMPANY_EMAIL, COMPANY_PHONE, SERVICES } from '../constants';
+import { trackEvent } from '../utils/analytics';
 import { Reveal } from '../components/Reveal';
 import { SmartCaptcha, SmartCaptchaHandle } from '../components/SmartCaptcha';
 
@@ -11,6 +13,7 @@ const Contact: React.FC = () => {
     companyName: '',
     email: '',
     phone: '',
+    reason: '',
     service: '',
     message: ''
   });
@@ -24,6 +27,22 @@ const Contact: React.FC = () => {
   
   // UI State
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const source = searchParams.get('source') || '';
+  const initialService = searchParams.get('service') || '';
+  const utm_source = searchParams.get('utm_source') || '';
+  const utm_medium = searchParams.get('utm_medium') || '';
+  const utm_campaign = searchParams.get('utm_campaign') || '';
+  
+  // Set initial service if provided in URL
+  useEffect(() => {
+    if (initialService) {
+      setFormData(prev => ({ ...prev, service: initialService, reason: initialService === 'trainings' ? 'Training' : prev.reason }));
+    }
+  }, [initialService]);
+
 
   // Scroll to top listener
   useEffect(() => {
@@ -55,7 +74,12 @@ const Contact: React.FC = () => {
         else if (value.trim().length < 2) error = 'Name must be at least 2 characters.';
         break;
       case 'companyName':
-        if (!value.trim()) error = 'Company name is required.';
+        if (!value.trim() && formData.reason !== 'Training' && formData.reason !== 'General Inquiry') {
+           error = 'Company name is required for business inquiries.';
+        }
+        break;
+      case 'reason':
+        if (!value) error = 'Please select a reason for inquiry.';
         break;
       case 'email':
         if (!value.trim()) error = 'Business email is required.';
@@ -71,9 +95,7 @@ const Contact: React.FC = () => {
         if (!value.trim()) error = 'Message is required.';
         else if (value.trim().length < 10) error = 'Please provide more details (at least 10 characters).';
         break;
-      case 'service':
-        if (!value) error = 'Please select a service.';
-        break;
+      
     }
     return error;
   };
@@ -122,27 +144,24 @@ const Contact: React.FC = () => {
       
       try {
         // Use AJAX submission to avoid redirection
-        const response = await fetch(`https://formsubmit.co/ajax/${COMPANY_EMAIL}`, {
+        const response = await fetch('/api/inquiry', {
           method: "POST",
           headers: { 
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
           body: JSON.stringify({
-            // FormSubmit Configuration
-            _subject: `New Inquiry: ${formData.fullName} - TechDefends`,
-            _template: "box",
-            _captcha: "false", // Disable FormSubmit's captcha as we handle it on client side
-            
-            // Map internal state keys to readable labels for the email
-            "Full Name": formData.fullName,
-            "Company": formData.companyName,
-            "Email": formData.email,
-            "Phone": formData.phone,
-            "Service Interest": formData.service,
-            "Message": formData.message,
-            "Human Verified": "Yes",
-            "Verification Token": captchaToken
+            name: formData.fullName,
+            company: formData.companyName,
+            email: formData.email,
+            phone: formData.phone,
+            reason: formData.reason,
+            leadType: formData.reason === 'Training' ? 'training_enquiry' : 'business_enquiry',
+            sourcePage: location.pathname,
+            message: formData.message,
+            utm_source: utm_source,
+            utm_medium: utm_medium,
+            utm_campaign: utm_campaign
           })
         });
 
@@ -150,6 +169,18 @@ const Contact: React.FC = () => {
           // Success Animation State
           setIsSubmitting(false);
           setIsSuccess(true);
+          
+          // Track Event
+          trackEvent('generate_lead', {
+            page_path: location.pathname,
+            utm_source,
+            utm_medium,
+            utm_campaign,
+            source,
+            lead_type: formData.reason === 'Training' ? 'training_enquiry' : 'business_enquiry',
+            reason: formData.reason,
+            service: formData.service
+          });
           
           // Delay actual transition to show success state on button
           setTimeout(() => {
@@ -269,7 +300,7 @@ const Contact: React.FC = () => {
                 <p className="text-slate-600 text-sm mb-4">
                   For active cyber attacks or data breaches, call our emergency hotline immediately.
                 </p>
-                <a href={`tel:${COMPANY_PHONE}`} className="inline-flex items-center text-brand-600 font-bold hover:underline hover:text-brand-700 transition-colors">
+                <a href={`tel:${COMPANY_PHONE}`} onClick={() => trackEvent('phone_click')} className="inline-flex items-center text-brand-600 font-bold hover:underline hover:text-brand-700 transition-colors">
                   Call Emergency Line <Phone size={16} className="ml-2" aria-hidden="true" />
                 </a>
               </div>
@@ -346,7 +377,51 @@ const Contact: React.FC = () => {
                     )}
                   </div>
 
+                  
+                  
+                  {/* Reason for Inquiry */}
+                  <div>
+                    <label htmlFor="reason" className="block text-sm font-medium text-slate-700 mb-1">
+                      Reason for Inquiry <span className="text-red-500" aria-hidden="true">*</span>
+                    </label>
+                    <div className="relative">
+                      <select
+                        id="reason"
+                        name="reason"
+                        required
+                        aria-required="true"
+                        aria-invalid={!!errors.reason}
+                        aria-describedby={errors.reason ? "reason-error" : undefined}
+                        value={formData.reason}
+                        onChange={(e) => {
+                          handleChange(e);
+                          if (e.target.value === 'Training' || e.target.value === 'General Inquiry') {
+                            setErrors(prev => ({...prev, companyName: ''}));
+                          }
+                        }}
+                        onBlur={handleBlur}
+                        className={getInputClass('reason')}
+                      >
+                        <option value="">Select a reason...</option>
+                        <option value="Cybersecurity Services">Cybersecurity Services</option>
+                        <option value="VAPT / Security Assessment">VAPT / Security Assessment</option>
+                        <option value="Managed Security / SOC">Managed Security / SOC</option>
+                        <option value="Microsoft 365">Microsoft 365</option>
+                        <option value="Network Security">Network Security</option>
+                        <option value="Cloud / Infrastructure">Cloud / Infrastructure</option>
+                        <option value="Managed IT">Managed IT</option>
+                        <option value="Technology / Product Requirement">Technology / Product Requirement</option>
+                        <option value="Training">Training</option>
+                        <option value="General Inquiry">General Inquiry</option>
+                      </select>
+                    </div>
+                    {touched.reason && errors.reason && (
+                      <p id="reason-error" className="mt-1 text-xs text-red-600 font-medium animate-fade-in" role="alert">{errors.reason}</p>
+                    )}
+                  </div>
+
                   {/* Company Name */}
+                  {formData.reason !== 'Training' && formData.reason !== 'General Inquiry' && (
                   <div>
                     <label htmlFor="companyName" className="block text-sm font-medium text-slate-700 mb-1">
                       Company Name <span className="text-red-500" aria-hidden="true">*</span>
@@ -377,6 +452,7 @@ const Contact: React.FC = () => {
                       <p id="companyName-error" className="mt-1 text-xs text-red-600 font-medium animate-fade-in" role="alert">{errors.companyName}</p>
                     )}
                   </div>
+                  )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Email */}
@@ -438,36 +514,6 @@ const Contact: React.FC = () => {
                         <p id="phone-error" className="mt-1 text-xs text-red-600 font-medium animate-fade-in" role="alert">{errors.phone}</p>
                       )}
                     </div>
-                  </div>
-
-                  {/* Service Selection */}
-                  <div>
-                    <label htmlFor="service" className="block text-sm font-medium text-slate-700 mb-1">
-                      Service Interested In <span className="text-red-500" aria-hidden="true">*</span>
-                    </label>
-                    <div className="relative">
-                      <select
-                        id="service"
-                        name="service"
-                        required
-                        aria-required="true"
-                        aria-invalid={!!errors.service}
-                        aria-describedby={errors.service ? "service-error" : undefined}
-                        value={formData.service}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className={getInputClass('service')}
-                      >
-                        <option value="">Select a service...</option>
-                        {SERVICES.map(s => (
-                          <option key={s.id} value={s.title}>{s.title}</option>
-                        ))}
-                        <option value="Other / General Inquiry">Other / General Inquiry</option>
-                      </select>
-                    </div>
-                    {touched.service && errors.service && (
-                      <p id="service-error" className="mt-1 text-xs text-red-600 font-medium animate-fade-in" role="alert">{errors.service}</p>
-                    )}
                   </div>
 
                   {/* Message */}

@@ -96,9 +96,9 @@ const NewsCard: React.FC<NewsCardProps> = ({ item: initialItem, index, initially
   };
 
   // Construct unique URL for this news item using query param and hash
-  // Format: base_url/#/?news_id=123
+  // Format: base_url/?news_id=123
   const baseUrl = window.location.href.split('?')[0].split('#')[0];
-  const shareUrl = `${baseUrl}#/?news_id=${news.id}`;
+  const shareUrl = `${baseUrl}?news_id=${news.id}`;
   const shareTextContent = `${news.title}`;
 
   const copyToClipboard = async () => {

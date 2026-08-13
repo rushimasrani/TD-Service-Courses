@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
   return (
     <footer className="bg-slate-900 text-white pt-16 pb-8 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
           
           {/* Brand Info */}
           <div className="space-y-6">
@@ -48,12 +48,29 @@ const Footer: React.FC = () => {
             </div>
           </div>
 
+          
+          {/* Industries */}
+          <div>
+            <h3 className="text-lg font-semibold mb-6 border-b border-brand-900 pb-2 inline-block">Industries</h3>
+            <ul className="space-y-3">
+              <li><Link to="/industries/financial-services" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Financial Services</Link></li>
+              <li><Link to="/industries/ca-accounting-firms" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">CA & Accounting Firms</Link></li>
+              <li><Link to="/industries/it-companies" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">IT Companies & MSPs</Link></li>
+              <li><Link to="/industries/smes-startups" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">SMEs & Startups</Link></li>
+              <li><Link to="/industries/healthcare" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Healthcare</Link></li>
+            </ul>
+          </div>
+
           {/* Quick Links */}
           <div>
             <h3 className="text-lg font-semibold mb-6 border-b border-brand-900 pb-2 inline-block">Quick Links</h3>
             <ul className="space-y-3">
               <li><Link to="/" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Home</Link></li>
               <li><Link to="/about" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">About Us</Link></li>
+
+              <li><Link to="/case-studies" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Case Studies</Link></li>
+              <li><Link to="/resources" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Resources</Link></li>
+
               <li><Link to="/careers" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Careers</Link></li>
               <li><Link to="/contact" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Contact Us</Link></li>
               <li><Link to="/contact" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Request Consultation</Link></li>

@@ -60,6 +60,38 @@ const Navbar: React.FC = () => {
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/" className={`font-medium text-sm transition-colors duration-300 ${textColor} ${hoverColor}`}>Home</Link>
             <Link to="/about" className={`font-medium text-sm transition-colors duration-300 ${textColor} ${hoverColor}`}>About Us</Link>
+
+            <Link to="/case-studies" className={`font-medium text-sm transition-colors duration-300 ${textColor} ${hoverColor}`}>Case Studies</Link>
+            <Link to="/resources" className={`font-medium text-sm transition-colors duration-300 ${textColor} ${hoverColor}`}>Resources</Link>
+
+
+            {/* Industries Dropdown */}
+            <div className="relative group">
+              <button className={`font-medium text-sm flex items-center gap-1 transition-colors duration-300 py-2 ${textColor} ${hoverColor}`}>
+                Industries <ChevronDown size={14} />
+              </button>
+              
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[280px] bg-white border border-slate-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top p-2 flex flex-col gap-1">
+                 <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white transform rotate-45 border-t border-l border-slate-100"></div>
+                 
+                 <Link to="/industries/financial-services" onClick={() => setIsOpen(false)} className="block p-3 text-sm font-semibold text-slate-700 hover:text-brand-600 hover:bg-slate-50 rounded-lg transition-colors">
+                   Financial Services & FinTech
+                 </Link>
+                 <Link to="/industries/ca-accounting-firms" onClick={() => setIsOpen(false)} className="block p-3 text-sm font-semibold text-slate-700 hover:text-brand-600 hover:bg-slate-50 rounded-lg transition-colors">
+                   CA & Accounting Firms
+                 </Link>
+                 <Link to="/industries/it-companies" onClick={() => setIsOpen(false)} className="block p-3 text-sm font-semibold text-slate-700 hover:text-brand-600 hover:bg-slate-50 rounded-lg transition-colors">
+                   IT Companies & MSPs
+                 </Link>
+                 <Link to="/industries/smes-startups" onClick={() => setIsOpen(false)} className="block p-3 text-sm font-semibold text-slate-700 hover:text-brand-600 hover:bg-slate-50 rounded-lg transition-colors">
+                   SMEs & Startups
+                 </Link>
+                 <Link to="/industries/healthcare" onClick={() => setIsOpen(false)} className="block p-3 text-sm font-semibold text-slate-700 hover:text-brand-600 hover:bg-slate-50 rounded-lg transition-colors">
+                   Healthcare & Hospitals
+                 </Link>
+              </div>
+            </div>
+
             
             <div className="relative group">
               <button className={`font-medium text-sm flex items-center gap-1 transition-colors duration-300 py-2 ${textColor} ${hoverColor}`}>
@@ -134,6 +166,11 @@ const Navbar: React.FC = () => {
                      </Link>
                   </div>
                  </div>
+
+                 <Link to="/trainings" className="flex items-center justify-between p-3 rounded-lg hover:bg-brand-50 hover:text-brand-600 transition-colors cursor-pointer relative z-10 w-full mt-2 border-t border-slate-100">
+                    <span className="text-sm font-bold">View All Programs</span>
+                    <ChevronRight size={14} />
+                 </Link>
               </div>
             </div>
 
@@ -190,6 +227,25 @@ const Navbar: React.FC = () => {
             <Link to="/about" className="block px-3 py-3 text-base font-medium text-slate-900 hover:text-brand-600 hover:bg-slate-50 rounded-md">About Us</Link>
             
             <div className="space-y-1">
+              
+              {/* Industries Mobile */}
+              <button 
+                onClick={() => setActiveDropdown(activeDropdown === 'industries' ? null : 'industries')}
+                className="w-full flex justify-between items-center px-3 py-3 text-base font-medium text-slate-900 hover:text-brand-600 hover:bg-slate-50 rounded-md"
+              >
+                Industries <ChevronDown size={16} className={`transform transition-transform ${activeDropdown === 'industries' ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {activeDropdown === 'industries' && (
+                <div className="pl-4 space-y-1 border-l-2 border-brand-100 ml-3">
+                  <Link to="/industries/financial-services" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-sm font-medium text-slate-600 hover:text-brand-600 hover:bg-slate-50 rounded-md">Financial Services</Link>
+                  <Link to="/industries/ca-accounting-firms" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-sm font-medium text-slate-600 hover:text-brand-600 hover:bg-slate-50 rounded-md">CA & Accounting Firms</Link>
+                  <Link to="/industries/it-companies" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-sm font-medium text-slate-600 hover:text-brand-600 hover:bg-slate-50 rounded-md">IT Companies & MSPs</Link>
+                  <Link to="/industries/smes-startups" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-sm font-medium text-slate-600 hover:text-brand-600 hover:bg-slate-50 rounded-md">SMEs & Startups</Link>
+                  <Link to="/industries/healthcare" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-sm font-medium text-slate-600 hover:text-brand-600 hover:bg-slate-50 rounded-md">Healthcare</Link>
+                </div>
+              )}
+
               <button 
                 onClick={() => setActiveDropdown(activeDropdown === 'trainings' ? null : 'trainings')}
                 className="w-full flex justify-between items-center px-3 py-3 text-base font-medium text-slate-900 hover:text-brand-600 hover:bg-slate-50 rounded-md"
