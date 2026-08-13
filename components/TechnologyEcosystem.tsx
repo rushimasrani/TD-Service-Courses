@@ -7,7 +7,7 @@ const techCategories = [
     vendors: [
       { name: 'Sophos', alt: 'Sophos cybersecurity solutions', logo: '/vendors/sophos.svg' },
       { name: 'Fortinet', alt: 'Fortinet network security solutions', logo: '/vendors/fortinet.svg' },
-      { name: 'Check Point', alt: 'Check Point cybersecurity solutions', logo: '/vendors/check-point.png' },
+      { name: 'Check Point', alt: 'Check Point cybersecurity solutions', logo: '/vendors/check-point.svg' },
       { name: 'CrowdStrike', alt: 'CrowdStrike endpoint security solutions', logo: '/vendors/crowdstrike.svg' },
       { name: 'Palo Alto Networks', alt: 'Palo Alto Networks cybersecurity solutions', logo: '/vendors/palo-alto-networks.svg' },
       { name: 'Bitdefender', alt: 'Bitdefender cybersecurity solutions', logo: '/vendors/bitdefender.svg' },
@@ -50,17 +50,17 @@ const techCategories = [
 const VendorLogo: React.FC<{ vendor: any }> = ({ vendor }) => {
   return (
     <div 
-      className="flex flex-col items-center justify-center p-6 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 w-full min-h-[140px] group"
+      className="flex flex-col items-center justify-center p-6 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 w-full min-h-[160px] group"
     >
-      <div className="h-12 w-full flex items-center justify-center mb-3">
+      <div className="h-[70px] w-full flex items-center justify-center mb-4">
         <img 
           src={vendor.logo} 
           alt={vendor.alt} 
-          className="max-h-full max-w-full object-contain grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+          className="max-h-full max-w-full object-contain"
           loading="lazy"
         />
       </div>
-      <span className="font-semibold text-sm text-slate-700 text-center tracking-tight mt-auto">
+      <span className="font-semibold text-sm text-slate-800 text-center tracking-tight mt-auto">
         {vendor.name}
       </span>
     </div>
