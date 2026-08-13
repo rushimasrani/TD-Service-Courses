@@ -659,7 +659,7 @@ const CourseDetail: React.FC = () => {
     };
     
     // Some courses might not have FAQS, so we safely handle it
-    const schemas = [courseSchema];
+    const schemas: any[] = [courseSchema];
     
     if (FAQS && FAQS.length > 0) {
         const faqSchema = {
@@ -707,14 +707,22 @@ const CourseDetail: React.FC = () => {
           setSubmitStatus(null);
         }, 3000);
       } else {
-        const errorData = await response.json().catch(() => ({ error: 'Network error or invalid response' }));
+        const errorData = await response.json().catch(() => null);
+        console.error(`Submission failed (HTTP ${response.status}):`, errorData || 'Invalid JSON response from server');
         setSubmitStatus('error');
-        setErrorMessage(errorData.details || errorData.error || 'Something went wrong. Please try again later.');
+        
+        let userMessage = "We couldn't submit your enquiry right now. Please try again or contact us on WhatsApp.";
+        if (response.status === 400) {
+          userMessage = "Please check your inputs and try again.";
+        } else if (response.status === 500) {
+          userMessage = "Our server encountered an issue processing your request. Please try again later or contact us on WhatsApp.";
+        }
+        setErrorMessage(userMessage);
       }
     } catch (err: any) {
-      console.error(err);
+      console.error("Network error:", err);
       setSubmitStatus('error');
-      setErrorMessage(err.message || 'Something went wrong. Please try again later.');
+      setErrorMessage("Network failure. We couldn't reach the server. Please check your internet connection and try again.");
     } finally {
       setIsSubmitting(false);
     }

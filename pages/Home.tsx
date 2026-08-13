@@ -8,6 +8,7 @@ import ServiceCard from '../components/ServiceCard';
 import HeroBackground from '../components/HeroBackground';
 import NewsCard from '../components/NewsCard';
 import { Reveal } from '../components/Reveal';
+import TechnologyEcosystem from '../components/TechnologyEcosystem';
 import { Server, GraduationCap, FileText, LayoutGrid, ShieldCheck } from 'lucide-react';
 
 
@@ -181,20 +182,7 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Trust Bar */}
-      <div className="bg-slate-50 py-10 border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-slate-500 text-sm font-semibold uppercase tracking-wider mb-6">Trusted by industry leaders</p>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-            {/* Logos represented by text for this demo */}
-            <span className="text-2xl font-bold text-slate-400 hover:text-slate-600 hover:scale-105 transition-all duration-300 cursor-default">Google</span>
-            <span className="text-2xl font-bold text-slate-400 hover:text-slate-600 hover:scale-105 transition-all duration-300 cursor-default">Microsoft</span>
-            <span className="text-2xl font-bold text-slate-400 hover:text-slate-600 hover:scale-105 transition-all duration-300 cursor-default">Amazon</span>
-            <span className="text-2xl font-bold text-slate-400 hover:text-slate-600 hover:scale-105 transition-all duration-300 cursor-default">Cisco</span>
-            <span className="text-2xl font-bold text-slate-400 hover:text-slate-600 hover:scale-105 transition-all duration-300 cursor-default">IBM</span>
-          </div>
-        </div>
-      </div>
+      <TechnologyEcosystem />
 
       {/* Mission & Vision - Added Section */}
       <section className="py-20 bg-slate-900 relative overflow-hidden">

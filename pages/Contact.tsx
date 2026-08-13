@@ -193,14 +193,22 @@ const Contact: React.FC = () => {
         } else {
           setIsSubmitting(false);
           // If server responds with error
-          const errorData = await response.json().catch(() => ({}));
-          console.error("Submission failed:", errorData);
-          alert("Something went wrong. Please try again later or contact us directly via phone.");
+          const errorData = await response.json().catch(() => null);
+          console.error(`Submission failed (HTTP ${response.status}):`, errorData || 'Invalid JSON response from server');
+          
+          let userMessage = "We couldn't submit your enquiry right now. Please try again or contact us on WhatsApp.";
+          if (response.status === 400) {
+            userMessage = "Please check your inputs and try again.";
+          } else if (response.status === 500) {
+            userMessage = "Our server encountered an issue processing your request. Please try again later or contact us on WhatsApp.";
+          }
+          
+          alert(userMessage);
         }
       } catch (error) {
         setIsSubmitting(false);
         console.error("Network error:", error);
-        alert("Unable to send message. Please check your internet connection.");
+        alert("Network failure. We couldn't reach the server. Please check your internet connection and try again.");
       }
     }
   };
