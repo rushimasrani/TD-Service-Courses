@@ -122,6 +122,101 @@ async function startServer() {
     }
   });
 
+  // API Route for handling Internship Applications
+  app.post("/api/internship-application", async (req, res) => {
+    const { 
+      fullName, 
+      email, 
+      phone, 
+      cityState, 
+      collegeName, 
+      degree, 
+      branch, 
+      yearOfStudy, 
+      cgpa, 
+      domain, 
+      duration, 
+      mode, 
+      startDate, 
+      skills, 
+      projects, 
+      statementOfPurpose, 
+      resumeType, 
+      resumeFileName, 
+      resumeLink, 
+      referralSource, 
+      linkedIn, 
+      github 
+    } = req.body;
+
+    if (!fullName || !email || !phone || !collegeName || !domain || !duration || !statementOfPurpose) {
+      return res.status(400).json({ error: "Missing required fields for internship application." });
+    }
+
+    const applicationId = `TDA-2026-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    try {
+      const tenantId = process.env.MS_TENANT_ID;
+      const clientId = process.env.MS_CLIENT_ID;
+      const clientSecret = process.env.MS_CLIENT_SECRET;
+      const senderEmail = process.env.MS_SENDER_EMAIL || process.env.INQUIRY_DESTINATION_EMAIL || "info@techdefends.com";
+      const destinationEmail = process.env.INQUIRY_DESTINATION_EMAIL || "info@techdefends.com";
+
+      const subject = `[Internship Application] ${domain} - ${fullName} (${applicationId})`;
+      const htmlContent = `
+        <h3>TechDefends Academy Internship Application</h3>
+        <p><strong>Application Reference:</strong> ${applicationId}</p>
+        <hr />
+        <h4>Applicant Information</h4>
+        <p><strong>Full Name:</strong> ${fullName}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>City & State:</strong> ${cityState || 'Not specified'}</p>
+        <p><strong>LinkedIn:</strong> ${linkedIn || 'Not provided'}</p>
+        <p><strong>GitHub / Portfolio:</strong> ${github || 'Not provided'}</p>
+        <hr />
+        <h4>Academic Details</h4>
+        <p><strong>College / University:</strong> ${collegeName}</p>
+        <p><strong>Degree & Branch:</strong> ${degree} - ${branch}</p>
+        <p><strong>Current Year of Study:</strong> ${yearOfStudy}</p>
+        <p><strong>CGPA / Percentage:</strong> ${cgpa || 'Not provided'}</p>
+        <hr />
+        <h4>Internship Track & Preferences</h4>
+        <p><strong>Chosen Domain Track:</strong> ${domain}</p>
+        <p><strong>Internship Duration:</strong> ${duration}</p>
+        <p><strong>Preferred Mode:</strong> ${mode}</p>
+        <p><strong>Earliest Available Start Date:</strong> ${startDate || 'Immediate'}</p>
+        <p><strong>Familiar Skills / Tools:</strong> ${Array.isArray(skills) ? skills.join(', ') : (skills || 'None selected')}</p>
+        <p><strong>Prior Projects / CTF Experience:</strong> ${projects ? projects.replace(/\n/g, '<br>') : 'None'}</p>
+        <p><strong>Resume:</strong> ${resumeType === 'upload' ? (resumeFileName || 'Uploaded file') : (resumeLink || 'None')}</p>
+        <p><strong>Referral Source:</strong> ${referralSource || 'Website'}</p>
+        <hr />
+        <h4>Statement of Purpose</h4>
+        <p>${statementOfPurpose ? statementOfPurpose.replace(/\n/g, '<br>') : 'No statement provided'}</p>
+      `;
+
+      if (tenantId && clientId && clientSecret) {
+        try {
+          const accessToken = await getGraphToken(tenantId, clientId, clientSecret);
+          await sendGraphEmail(accessToken, senderEmail, destinationEmail, subject, htmlContent);
+        } catch (mailErr) {
+          console.warn("Could not send email via MS Graph (will still accept application):", mailErr);
+        }
+      } else {
+        console.log(`[TechDefends Academy] New Internship Application (${applicationId}) from ${fullName} for ${domain}`);
+      }
+
+      return res.status(200).json({ 
+        success: true, 
+        applicationId, 
+        message: "Internship application submitted successfully!" 
+      });
+    } catch (error: any) {
+      console.error("Error processing internship application:", error);
+      return res.status(500).json({ error: "Failed to process internship application.", details: error.message || String(error) });
+    }
+  });
+
   // Vite middleware for development
   let isDev = process.env.NODE_ENV !== "production";
   if (isDev) {

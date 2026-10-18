@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -22,6 +22,7 @@ import ResourceDetail from './pages/ResourceDetail';
 
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Trainings from './pages/Trainings';
+import InternshipApplication from './pages/InternshipApplication';
 
 import FinancialServices from './pages/industries/FinancialServices';
 import CAFirms from './pages/industries/CAFirms';
@@ -50,6 +51,8 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
+            <Route path="/trainings/internship" element={<InternshipApplication />} />
+            <Route path="/internship" element={<Navigate to="/trainings/internship" replace />} />
             <Route path="/trainings" element={<Trainings />} />
 
             {/* Industries */}
@@ -67,6 +70,7 @@ const App: React.FC = () => {
             <Route path="/services/microsoft-365" element={<Microsoft365Service />} />
             <Route path="/services/network-security" element={<NetworkSecurityService />} />
             <Route path="/services/:slug" element={<ServiceDetail />} />
+            <Route path="/courses" element={<Navigate to="/trainings" replace />} />
             <Route path="/courses/:slug" element={<CourseDetail />} />
             
             {/* Phase 6 Routes */}

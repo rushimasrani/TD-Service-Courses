@@ -16,25 +16,34 @@ const Navbar: React.FC = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu on route change
+  // Close mobile menu and sync scroll state on route change
   useEffect(() => {
     setIsOpen(false);
     setActiveDropdown(null);
-  }, [location]);
+    setIsScrolled(window.scrollY > 20);
+  }, [location.pathname]);
 
-  // Dynamic styles based on scroll and menu state
-  const navBackground = isScrolled || isOpen ? 'bg-white shadow-md' : 'bg-transparent';
+  // Route matching for light background sections (Courses and Trainings)
+  const isCoursesPage = location.pathname === '/courses' || location.pathname.startsWith('/courses/');
+  const isTrainingsPage = location.pathname === '/trainings' || location.pathname.startsWith('/trainings/');
+  const isLightPage = isCoursesPage || isTrainingsPage;
+
+  // Dynamic styles based on scroll, mobile menu, or light-themed page route
+  const isOpaque = isScrolled || isOpen || isLightPage;
+
+  const navBackground = isOpaque ? 'bg-white shadow-md' : 'bg-transparent';
   const navPadding = isScrolled ? 'py-2' : 'py-5';
   
-  const textColor = isScrolled || isOpen ? 'text-slate-700' : 'text-white/90';
-  const hoverColor = isScrolled || isOpen ? 'hover:text-brand-600' : 'hover:text-white';
+  const textColor = isOpaque ? 'text-slate-700' : 'text-white/90';
+  const hoverColor = isOpaque ? 'hover:text-brand-600' : 'hover:text-white';
   
-  const logoMainColor = isScrolled || isOpen ? 'text-slate-900' : 'text-white';
-  const logoSubColor = isScrolled || isOpen ? 'text-slate-500' : 'text-slate-300';
+  const logoMainColor = isOpaque ? 'text-slate-900' : 'text-white';
+  const logoSubColor = isOpaque ? 'text-slate-500' : 'text-slate-300';
 
   return (
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-in-out ${navBackground} ${navPadding}`}>
@@ -167,6 +176,21 @@ const Navbar: React.FC = () => {
                   </div>
                  </div>
 
+                 <Link 
+                   to="/trainings/internship" 
+                   onClick={() => setIsOpen(false)}
+                   className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer relative z-10 w-full group/internship"
+                 >
+                   <div>
+                     <div className="flex items-center gap-2">
+                       <h4 className="text-sm font-semibold text-slate-900 group-hover/internship:text-brand-600 transition-colors">Internship</h4>
+                       <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-brand-50 text-brand-600 rounded border border-brand-100">Apply</span>
+                     </div>
+                     <p className="text-xs text-slate-500 line-clamp-1">Hands-on practical training & mentorship</p>
+                   </div>
+                   <ChevronRight size={14} className="text-slate-400 group-hover/internship:text-brand-600 transition-colors" />
+                 </Link>
+
                  <Link to="/trainings" className="flex items-center justify-between p-3 rounded-lg hover:bg-brand-50 hover:text-brand-600 transition-colors cursor-pointer relative z-10 w-full mt-2 border-t border-slate-100">
                     <span className="text-sm font-bold">View All Programs</span>
                     <ChevronRight size={14} />
@@ -292,6 +316,24 @@ const Navbar: React.FC = () => {
                         <Link to="/courses/nextgen-ai-soc-elite" onClick={() => setIsOpen(false)} className="block px-3 py-2 text-sm font-medium text-slate-500 hover:text-brand-600">NextGen AI SOC Elite Program</Link>
                      </div>
                   )}
+
+                  <Link
+                    to="/trainings/internship"
+                    onClick={() => setIsOpen(false)}
+                    className="w-full flex justify-between items-center px-3 py-2 text-sm font-medium text-slate-600 hover:text-brand-600 hover:bg-slate-50 rounded-md"
+                  >
+                    <span>Internship</span>
+                    <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-brand-50 text-brand-600 rounded border border-brand-100">Apply</span>
+                  </Link>
+
+                  <Link
+                    to="/trainings"
+                    onClick={() => setIsOpen(false)}
+                    className="w-full flex justify-between items-center px-3 py-2 text-sm font-bold text-brand-600 hover:bg-brand-50 rounded-md mt-1 border-t border-slate-100"
+                  >
+                    <span>View All Programs</span>
+                    <ChevronRight size={14} />
+                  </Link>
                 </div>
               )}
             </div>

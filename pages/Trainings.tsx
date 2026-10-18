@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, GraduationCap, ArrowRight, CheckCircle, ShieldCheck, Briefcase } from 'lucide-react';
+import { BookOpen, GraduationCap, ArrowRight, CheckCircle, ShieldCheck, Briefcase, Sparkles } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
@@ -114,7 +114,7 @@ const Trainings: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen pt-24 pb-16">
+    <div className="bg-slate-50 min-h-screen pt-32 sm:pt-36 pb-16">
       <Helmet>
         <title>Cybersecurity & IT Training | TechDefends</title>
         <meta name="description" content="Professional cybersecurity and IT training programs. Learn AWS, CCNA, Ethical Hacking, DevOps, and SOC with hands-on labs and 100% Placement Guarantee." />
@@ -170,7 +170,7 @@ const Trainings: React.FC = () => {
 
         {/* Tab Navigation */}
         <div className="flex justify-center mb-12">
-          <div className="bg-white p-1 rounded-xl shadow-sm border border-slate-200 inline-flex">
+          <div className="bg-white p-1 rounded-xl shadow-sm border border-slate-200 inline-flex flex-wrap gap-1">
             <button
               onClick={() => handleTabClick('courses')}
               className={`flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
@@ -193,6 +193,14 @@ const Trainings: React.FC = () => {
               <GraduationCap size={18} />
               Career Courses
             </button>
+            <Link
+              to="/trainings/internship"
+              className="flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold text-slate-600 hover:text-brand-600 hover:bg-slate-50 transition-all duration-200"
+            >
+              <Sparkles size={18} className="text-brand-600" />
+              <span>Internship</span>
+              <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-brand-50 text-brand-600 rounded border border-brand-100">Apply</span>
+            </Link>
           </div>
         </div>
 

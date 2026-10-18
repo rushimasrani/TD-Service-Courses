@@ -771,7 +771,7 @@ const CourseDetail: React.FC = () => {
   }
 
   return (
-    <div className="bg-slate-50 min-h-screen pt-24 pb-16">
+    <div className="bg-slate-50 min-h-screen pt-28 pb-16">
 
       <Helmet>
         <title>{course?.title || 'Training Program'} | TechDefends</title>
