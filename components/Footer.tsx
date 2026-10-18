@@ -27,9 +27,9 @@ const Footer: React.FC = () => {
           
           {/* Brand Info */}
           <div className="space-y-6">
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="transition-transform duration-300 group-hover:scale-110">
-                <Logo size={40} />
+            <Link to="/" className="flex items-center gap-3 group" aria-label="TechDefends Home">
+              <div className="transition-transform duration-300 group-hover:scale-105">
+                <Logo size={44} className="rounded-xl shadow-md p-1 border border-slate-700/60" />
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-bold leading-none text-white">

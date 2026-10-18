@@ -1,56 +1,55 @@
-# Update TechDefends Website Footer: Contact Information & Social Media Links
+# Integrate Official TechDefends Logo into Header and Footer
 
-Targeted update of the TechDefends website footer to update office contact information and social media links according to official specifications.
-
----
-
-### User Review & Decisions
-
-> [!NOTE]
-> - **Centralized Contact Information**: Update `constants.ts` (`COMPANY_ADDRESS` and `COMPANY_PHONE`) so the new address and telephone number are synchronized across the footer, Contact page, WhatsApp button, and Chat Widget.
-> - **Clickable Phone Link**: Ensure phone number in the footer is rendered with a functional `tel:` link (`tel:+919429405607`) for direct mobile calling.
-> - **Social Media Platforms**:
->   1. **LinkedIn**: `https://www.linkedin.com/company/techdefends/`
->   2. **X (Twitter)**: `https://x.com/techdefends`
->   3. **YouTube**: `https://youtube.com/@techdefendsacademy?si=-WX23BF05pyRxoAf`
->   4. **Instagram**: `https://www.instagram.com/techdefends?vrfl=cTU3bDU5NG95ZHc4`
-> - **Removal**: Completely remove the Facebook icon.
-> - **Attributes**: Add `target="_blank"`, `rel="noopener noreferrer"`, and screen-reader `aria-label` attributes for accessibility.
-> - **Styling**: Preserve the circular icon buttons, dark slate background, sizing, spacing, and hover animations.
+Integrate the official TechDefends logo—featuring the metallic black-and-red shield, circuit traces, and TD monogram—into the website Header (Navbar) and Footer, ensuring it is always presented against a crisp white background across all navbar states and the dark footer.
 
 ---
 
-### 1. File Modifications
+### Provided Logo Asset
 
-#### A. Central Contact Constants (`constants.ts`)
-- Update `COMPANY_ADDRESS`:
-  `E-202, PNTC, Times of India Press Road, Vejalpur, Ahmedabad, Gujarat 380051`
-- Update `COMPANY_PHONE`:
-  `+91 94294 05607`
-- Keep `COMPANY_EMAIL`:
-  `info@techdefends.com` (unchanged)
+![Official TechDefends Logo](Gemini_Generated_Image_q9t2hjq9t2hjq9t2.png)
 
-#### B. Footer Component (`components/Footer.tsx`)
-- Import `Youtube` from `lucide-react` (remove `Facebook`).
-- Render official brand icons:
-  - LinkedIn (`<Linkedin size={18} />`)
-  - X (official vector SVG brand logo, size 18)
-  - YouTube (`<Youtube size={18} />`)
-  - Instagram (`<Instagram size={18} />`)
-- Update each `<a>` tag with official URLs, `target="_blank"`, `rel="noopener noreferrer"`, and `aria-label`.
-- Make phone number clickable:
-  `<a href="tel:+919429405607" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">{COMPANY_PHONE}</a>`
-- Make email address clickable:
-  `<a href="mailto:info@techdefends.com" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">{COMPANY_EMAIL}</a>`
+*Official TechDefends metallic shield emblem with brushed black & red TD monogram and circuit board traces on a white background.*
 
 ---
 
-### 2. Verification Plan
+### Proposed Changes
 
-1. Verify `constants.ts` contains the updated address and phone number.
-2. Verify `components/Footer.tsx` renders the new office address.
-3. Verify the phone number displays `+91 94294 05607` and links to `tel:+919429405607`.
-4. Verify the email address remains `info@techdefends.com`.
-5. Verify the 4 social links in exact order (LinkedIn, X, YouTube, Instagram) with correct URLs, `target="_blank"`, `rel="noopener noreferrer"`, and `aria-label`.
-6. Verify Facebook icon is completely removed.
-7. Run `compile_applet` to verify compilation with zero errors.
+#### 1. Asset Preparation & Storage (`public/assets/techdefends-logo.png`)
+- Store the official TechDefends logo asset in `public/assets/techdefends-logo.png` (and ensure high-resolution SVG/PNG representations are available).
+- Crop excessive whitespace around the shield so the metallic emblem and TD monogram remain sharp and legible even at navbar dimensions.
+- Preserve the authentic metallic brushed textures, black-and-ruby-red coloration, and white circuit-trace backdrop.
+
+#### 2. Shared Logo Component (`components/Logo.tsx`)
+- Update `components/Logo.tsx` to render the official TechDefends logo image asset:
+  - Add `alt="TechDefends Logo"` for accessibility.
+  - Accept `size`, `className`, and optional `variant` props.
+  - Include an explicit aspect ratio and clean white container styling where needed to prevent layout shifts.
+
+#### 3. Header / Navbar Integration (`components/Navbar.tsx`)
+- Update the brand link in the desktop and mobile navbar:
+  - **Transparent Navbar State (Dark Hero)**: Place the logo inside a compact, elegant white container (`bg-white p-1 rounded-xl shadow-sm border border-slate-100/30 ring-1 ring-black/5`) so the metallic shield is immediately legible from the first render without scrolling.
+  - **Scrolled / Solid White Navbar State**: Seamlessly blend the logo container with the white navbar background.
+  - **Preserved Structure**: Maintain the 64px (`h-16`) navbar height, brand wordmark (`TechDefends`), tagline (`Secure Today, Scale Tomorrow`), navigation links, dropdowns, and mobile menu without any layout shift.
+
+#### 4. Footer Integration (`components/Footer.tsx`)
+- In the existing dark footer (`bg-slate-900`):
+  - Place the official logo in a dedicated, well-proportioned white panel/container (`bg-white p-2 rounded-xl shadow-md border border-slate-700/50 inline-flex items-center justify-center`).
+  - Maintain the existing brand text, typography, Contact Info, social links (LinkedIn, X, YouTube, Instagram), and 5-column layout.
+  - Prevent any awkward sizing or overflow.
+
+---
+
+### Verification Plan
+
+1. **Asset Verification**: Ensure `public/assets/techdefends-logo.png` exists, is optimized, and loads with HTTP 200.
+2. **Navbar States**:
+   - Initial render on Home (dark hero) $\rightarrow$ Logo is enclosed in clean white container and clearly visible.
+   - Initial render on light pages (e.g. `/trainings`, `/trainings/internship`, `/courses`) $\rightarrow$ Logo blends naturally with white navbar.
+   - Scrolled state $\rightarrow$ Logo remains crisp with stable layout.
+3. **Footer**:
+   - Logo renders inside white container against dark slate footer.
+   - Layout, contact info, and social links remain perfectly aligned.
+4. **Mobile & Tablet**:
+   - Verify mobile navbar and drawer layout (375px viewport).
+5. **Compilation & Build**:
+   - Run `compile_applet` to ensure zero build or runtime errors.

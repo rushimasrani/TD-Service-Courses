@@ -1,0 +1,220 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Soft 3D drop shadow -->
+    <filter id="shieldShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.25" />
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.18" />
+    </filter>
+
+    <filter id="monogramDepth" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="4" dy="8" stdDeviation="6" flood-color="#050508" flood-opacity="0.55" />
+    </filter>
+
+    <!-- Metallic Brushed Linear Textures -->
+    <pattern id="brushedTexture" width="6" height="2" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0.5" x2="6" y2="0.5" stroke="#ffffff" stroke-opacity="0.08" stroke-width="0.5" />
+      <line x1="0" y1="1.5" x2="6" y2="1.5" stroke="#000000" stroke-opacity="0.14" stroke-width="0.5" />
+    </pattern>
+
+    <!-- Gradients - Shield Frame Left (Dark Steel) -->
+    <linearGradient id="shieldLeftBevel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#42464f" />
+      <stop offset="30%" stop-color="#24262b" />
+      <stop offset="70%" stop-color="#34373e" />
+      <stop offset="100%" stop-color="#121316" />
+    </linearGradient>
+
+    <!-- Gradients - Shield Frame Right (Ruby Red) -->
+    <linearGradient id="shieldRightBevel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#800b17" />
+      <stop offset="35%" stop-color="#c91a2c" />
+      <stop offset="70%" stop-color="#690712" />
+      <stop offset="100%" stop-color="#a81525" />
+    </linearGradient>
+
+    <!-- Monogram 'T' (Brushed Black Steel) -->
+    <linearGradient id="monogramT" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2f3238" />
+      <stop offset="25%" stop-color="#4c505a" />
+      <stop offset="55%" stop-color="#1e2025" />
+      <stop offset="80%" stop-color="#383c44" />
+      <stop offset="100%" stop-color="#131417" />
+    </linearGradient>
+
+    <!-- Monogram 'D' (Metallic Ruby Red Radial & Linear) -->
+    <radialGradient id="monogramDRadial" cx="42%" cy="42%" r="65%" fx="32%" fy="32%">
+      <stop offset="0%" stop-color="#ff4458" />
+      <stop offset="22%" stop-color="#d6192d" />
+      <stop offset="58%" stop-color="#990f1e" />
+      <stop offset="85%" stop-color="#690611" />
+      <stop offset="100%" stop-color="#4a030b" />
+    </radialGradient>
+
+    <linearGradient id="monogramDTopHighlight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff6e7f" />
+      <stop offset="60%" stop-color="#ff3b50" />
+      <stop offset="100%" stop-color="#b81626" />
+    </linearGradient>
+
+    <!-- Circuit Trace Gradient -->
+    <linearGradient id="circuitTrace" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#9ea5b3" />
+      <stop offset="100%" stop-color="#c5ccd9" />
+    </linearGradient>
+  </defs>
+
+  <!-- Clean Pure White Background -->
+  <rect width="100%" height="100%" fill="#ffffff" />
+
+  <!-- Shield Base & Drop Shadow -->
+  <g filter="url(#shieldShadow)">
+    
+    <!-- White Shield Interior Body -->
+    <path d="M 250,72 L 382,148 L 382,246 L 250,368 L 118,246 L 118,148 Z" fill="#ffffff" />
+
+    <!-- Circuit Board Traces & Solder Nodes (Silver/Metallic Gray) -->
+    <g stroke="url(#circuitTrace)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9">
+      <!-- Top Center Traces -->
+      <path d="M 250,86 L 250,146" />
+      <circle cx="250" cy="86" r="3" fill="#9ea5b3" />
+
+      <path d="M 235,95 L 235,116 L 220,131 L 220,146" />
+      <circle cx="235" cy="95" r="2.8" fill="#9ea5b3" />
+
+      <path d="M 265,95 L 265,116 L 280,131 L 280,146" />
+      <circle cx="265" cy="95" r="2.8" fill="#9ea5b3" />
+
+      <path d="M 218,105 L 202,118 L 202,146" />
+      <circle cx="218" cy="105" r="2.8" fill="#9ea5b3" />
+
+      <path d="M 282,105 L 298,118 L 298,146" />
+      <circle cx="282" cy="105" r="2.8" fill="#9ea5b3" />
+
+      <path d="M 190,118 L 175,128 L 175,146" />
+      <circle cx="190" cy="118" r="2.8" fill="#9ea5b3" />
+
+      <path d="M 310,118 L 325,128 L 325,146" />
+      <circle cx="310" cy="118" r="2.8" fill="#9ea5b3" />
+
+      <!-- Bottom Center Traces -->
+      <path d="M 250,352 L 250,296" />
+      <circle cx="250" cy="352" r="3" fill="#9ea5b3" />
+
+      <path d="M 238,342 L 238,322 L 222,308 L 222,250" />
+      <circle cx="238" cy="342" r="2.8" fill="#9ea5b3" />
+
+      <path d="M 262,342 L 262,322 L 278,308 L 278,285" />
+      <circle cx="262" cy="342" r="2.8" fill="#9ea5b3" />
+
+      <path d="M 224,330 L 206,315 L 206,290" />
+      <circle cx="224" cy="330" r="2.8" fill="#9ea5b3" />
+
+      <path d="M 276,330 L 294,315 L 294,285" />
+      <circle cx="276" cy="330" r="2.8" fill="#9ea5b3" />
+
+      <path d="M 222,250 L 222,270 L 205,282 L 205,325" />
+      <circle cx="222" cy="250" r="2.8" fill="#9ea5b3" />
+    </g>
+
+    <!-- SHIELD METALLIC BEVELED FRAME -->
+    
+    <!-- Top-Left Crest (Dark Brushed Steel) -->
+    <path d="M 250,72 L 250,96 L 142,148 L 118,148 Z" fill="url(#shieldLeftBevel)" />
+    <path d="M 250,72 L 250,86 L 142,136 L 142,148 Z" fill="#505560" opacity="0.65" />
+
+    <!-- Top-Right Crest (Ruby Red Metallic) -->
+    <path d="M 250,72 L 382,148 L 358,148 L 250,96 Z" fill="url(#shieldRightBevel)" />
+    <path d="M 250,72 L 382,148 L 358,136 L 250,86 Z" fill="#e62d40" opacity="0.8" />
+
+    <!-- Left Flank Outer Bevel (Dark Steel) -->
+    <path d="M 118,148 L 142,148 L 142,234 L 118,246 Z" fill="url(#shieldLeftBevel)" opacity="0.95" />
+
+    <!-- Right Flank Outer Bevel (Ruby Red Metallic) -->
+    <path d="M 382,148 L 382,246 L 358,234 L 358,148 Z" fill="url(#shieldRightBevel)" />
+    <path d="M 382,148 L 380,244 L 368,238 L 370,154 Z" fill="#ff4d61" opacity="0.5" />
+
+    <!-- Bottom-Left Bevel Angle -->
+    <path d="M 118,246 L 142,234 L 214,310 L 214,334 Z" fill="url(#shieldLeftBevel)" />
+    <path d="M 214,334 L 214,310 L 250,344 L 250,368 Z" fill="#202226" />
+
+    <!-- Bottom-Right Bevel Angle -->
+    <path d="M 382,246 L 250,368 L 250,344 L 358,234 Z" fill="url(#shieldRightBevel)" />
+    <path d="M 378,248 L 252,364 L 258,348 L 364,240 Z" fill="#ff5a6e" opacity="0.65" />
+
+    <!-- Sharp Center Apex Seams -->
+    <line x1="250" y1="72" x2="250" y2="96" stroke="#ffffff" stroke-width="1.8" stroke-opacity="0.85" />
+    <line x1="250" y1="344" x2="250" y2="368" stroke="#000000" stroke-width="1.6" stroke-opacity="0.6" />
+    
+    <!-- Outer Rim Specular Highlights -->
+    <path d="M 250,73 L 381,148" stroke="#ffa3ad" stroke-width="1.6" stroke-linecap="round" opacity="0.75" />
+    <path d="M 250,73 L 119,148" stroke="#8c929e" stroke-width="1.6" stroke-linecap="round" opacity="0.75" />
+    <path d="M 381,148 L 381,245 L 250,367" stroke="#ffa6b0" stroke-width="1.4" opacity="0.55" />
+    <path d="M 119,148 L 119,245 L 250,367" stroke="#50545e" stroke-width="1.4" opacity="0.45" />
+
+    <!-- STYLIZED 'TD' MONOGRAM EMBLEM -->
+    <g filter="url(#monogramDepth)">
+      
+      <!-- 'T' LETTER - LEFT WING ACCENT -->
+      <path d="M 122,198 C 122,238 136,268 160,296 L 160,268 C 144,248 136,226 136,198 Z" fill="url(#monogramT)" />
+      <path d="M 122,198 C 122,238 136,268 160,296 L 157,294 C 134,266 120,236 120,198 Z" fill="#717785" opacity="0.6" />
+
+      <!-- 'T' LETTER - TOP HORIZONTAL BAR + CENTER TRUNK -->
+      <polygon points="100,158 260,158 244,188 168,188 168,340 134,312 134,188 100,188" fill="url(#monogramT)" />
+      
+      <!-- T Top Edge Specular Chamfer -->
+      <polygon points="100,158 260,158 256,162 104,162" fill="#88909f" opacity="0.85" />
+      <polygon points="260,158 244,188 240,186 254,160" fill="#202226" />
+      <polygon points="100,158 100,188 104,185 104,162" fill="#585e6b" />
+
+      <!-- T Stem Left & Bottom Bevel Edge -->
+      <polygon points="134,188 134,312 138,308 138,188" fill="#585e6c" opacity="0.6" />
+      <polygon points="134,312 168,340 166,344 132,316" fill="#131417" />
+      <polygon points="168,188 168,340 164,336 164,188" fill="#1a1b1f" opacity="0.75" />
+
+      <!-- 'D' LETTER - INTERLOCKING RIGHT BODY (METALLIC RUBY RED) -->
+      <g>
+        <!-- D Main Face Path -->
+        <path d="M 234,158 
+                 L 334,158 
+                 C 378,158 400,185 400,225 
+                 C 400,268 376,286 332,286 
+                 L 234,286 Z
+                 M 268,198 
+                 L 324,198 
+                 C 350,198 365,208 365,225 
+                 C 365,242 350,250 324,250 
+                 L 268,250 Z" 
+              fill="url(#monogramDRadial)" 
+              fill-rule="evenodd" />
+
+        <!-- D Top Beveled Edge Chamfer (Highlight) -->
+        <polygon points="234,158 334,158 331,163 236,163" fill="url(#monogramDTopHighlight)" />
+        <path d="M 334,158 C 378,158 400,185 400,225 L 395,224 C 395,189 375,163 331,163 Z" fill="url(#monogramDTopHighlight)" opacity="0.95" />
+
+        <!-- D Outer Curve Right Specular Ridge -->
+        <path d="M 398,205 C 401,218 401,232 396,245 L 391,242 C 395,230 395,219 392,207 Z" fill="#ff7585" opacity="0.8" />
+
+        <!-- D Bottom Beveled Edge Chamfer (Shadow) -->
+        <polygon points="234,286 332,286 329,281 236,281" fill="#42040c" />
+        <path d="M 332,286 C 376,286 400,268 400,225 L 395,226 C 395,263 373,281 329,281 Z" fill="#42040c" />
+
+        <!-- D Inner Counter Rim Highlights and Shadows -->
+        <polygon points="268,198 324,198 322,202 270,202" fill="#5c060f" />
+        <polygon points="268,250 324,250 322,246 270,246" fill="#ff5a6e" opacity="0.85" />
+        <path d="M 324,250 C 350,250 365,242 365,225 L 362,225 C 362,239 348,246 322,246 Z" fill="#ff6b7d" opacity="0.9" />
+        <path d="M 324,198 C 350,198 365,208 365,225 L 362,225 C 362,211 348,202 322,202 Z" fill="#4d050c" />
+
+        <!-- Circular Brushed Texture Overlay on D -->
+        <path d="M 234,158 L 334,158 C 378,158 400,185 400,225 C 400,268 376,286 332,286 L 234,286 Z M 268,198 L 324,198 C 350,198 365,208 365,225 C 365,242 350,250 324,250 L 268,250 Z" 
+              fill="url(#brushedTexture)" 
+              fill-rule="evenodd" 
+              opacity="0.35" />
+      </g>
+    </g>
+
+    <!-- Subtle Brushed Texture Overlay on Left T -->
+    <polygon points="100,158 260,158 244,188 168,188 168,340 134,312 134,188 100,188" 
+             fill="url(#brushedTexture)" 
+             opacity="0.3" />
+  </g>
+</svg>

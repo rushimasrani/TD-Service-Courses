@@ -51,9 +51,9 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0 flex items-center gap-3 group">
-            <div className="transition-transform duration-300 group-hover:scale-110">
-              <Logo size={40} />
+          <Link to="/" className="flex-shrink-0 flex items-center gap-3 group" aria-label="TechDefends Home">
+            <div className="transition-transform duration-300 group-hover:scale-105">
+              <Logo size={40} className="shadow-sm" />
             </div>
             <div className="flex flex-col">
               <span className={`text-2xl font-bold leading-none transition-colors duration-300 ${logoMainColor}`}>
