@@ -28,6 +28,11 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { SmartCaptcha, SmartCaptchaHandle } from '../components/SmartCaptcha';
+import { 
+  getTomorrowKolkataDateString, 
+  getDefaultStartDateKolkata, 
+  isValidStartDateKolkata 
+} from '../utils/date';
 
 interface FormData {
   fullName: string;
@@ -110,6 +115,9 @@ const SKILL_TAGS = [
 ];
 
 export const InternshipApplication: React.FC = () => {
+  const minStartDate = getTomorrowKolkataDateString();
+  const defaultStartDate = getDefaultStartDateKolkata();
+
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
@@ -125,7 +133,7 @@ export const InternshipApplication: React.FC = () => {
     domain: DOMAIN_OPTIONS[0].title,
     duration: '3 Months',
     mode: 'Hybrid',
-    startDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    startDate: defaultStartDate,
     skills: ['Linux CLI', 'Networking (TCP/IP)'],
     projects: '',
     statementOfPurpose: '',
@@ -231,6 +239,13 @@ export const InternshipApplication: React.FC = () => {
           error = 'Please provide a link to your resume or portfolio.';
         }
         break;
+      case 'startDate':
+        if (!formData.startDate || !formData.startDate.trim()) {
+          error = 'Earliest available start date is required.';
+        } else if (!isValidStartDateKolkata(formData.startDate)) {
+          error = 'Please select a start date from tomorrow onwards.';
+        }
+        break;
       case 'termsAgreed':
         if (!formData.termsAgreed) error = 'You must accept the declaration to submit.';
         break;
@@ -271,6 +286,12 @@ export const InternshipApplication: React.FC = () => {
       newErrors.phone = 'Enter a valid phone number (e.g., +91 98765 43210).';
     }
 
+    if (!formData.startDate || !formData.startDate.trim()) {
+      newErrors.startDate = 'Earliest available start date is required.';
+    } else if (!isValidStartDateKolkata(formData.startDate)) {
+      newErrors.startDate = 'Please select a start date from tomorrow onwards.';
+    }
+
     if (formData.statementOfPurpose && formData.statementOfPurpose.trim().length < 25) {
       newErrors.statementOfPurpose = 'Please write at least 25 characters explaining your goals.';
     }
@@ -302,6 +323,7 @@ export const InternshipApplication: React.FC = () => {
       cityState: true,
       collegeName: true,
       branch: true,
+      startDate: true,
       statementOfPurpose: true,
       resume: true,
       termsAgreed: true
@@ -368,6 +390,7 @@ export const InternshipApplication: React.FC = () => {
       statementOfPurpose: '',
       resumeFileName: '',
       resumeLink: '',
+      startDate: defaultStartDate,
       termsAgreed: false
     }));
     setErrors({});
@@ -945,7 +968,7 @@ export const InternshipApplication: React.FC = () => {
                   </div>
 
                   {/* Start Date */}
-                  <div>
+                  <div id="startDate">
                     <label className="block text-sm font-medium text-slate-700 mb-1.5">
                       Earliest Available Start Date <span className="text-brand-600 font-bold">*</span>
                     </label>
@@ -956,11 +979,22 @@ export const InternshipApplication: React.FC = () => {
                       <input 
                         type="date"
                         name="startDate"
+                        min={minStartDate}
                         value={formData.startDate}
                         onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
+                        onBlur={() => handleBlur('startDate')}
+                        className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-lg text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 transition-all ${
+                          touched.startDate && errors.startDate 
+                            ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500' 
+                            : 'border-slate-300 focus:ring-brand-500/20 focus:border-brand-500'
+                        }`}
                       />
                     </div>
+                    {touched.startDate && errors.startDate && (
+                      <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                        <AlertCircle size={12} /> {errors.startDate}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

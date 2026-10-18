@@ -1,8 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Youtube, Instagram } from 'lucide-react';
 import { COMPANY_ADDRESS, COMPANY_EMAIL, COMPANY_PHONE, SERVICES } from '../constants';
 import Logo from './Logo';
+
+const XIcon: React.FC<{ size?: number; className?: string }> = ({ size = 18, className = "" }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="currentColor" 
+    className={className} 
+    aria-hidden="true"
+  >
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+);
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -33,16 +46,40 @@ const Footer: React.FC = () => {
             </p>
             
             <div className="flex space-x-4">
-              <a href="#" className="text-slate-400 hover:text-brand-500 transition-colors bg-slate-800 p-2 rounded-full">
+              <a 
+                href="https://www.linkedin.com/company/techdefends/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="LinkedIn"
+                className="text-slate-400 hover:text-brand-500 transition-colors bg-slate-800 hover:bg-slate-700/80 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-500/50"
+              >
                 <Linkedin size={18} />
               </a>
-              <a href="#" className="text-slate-400 hover:text-brand-500 transition-colors bg-slate-800 p-2 rounded-full">
-                <Twitter size={18} />
+              <a 
+                href="https://x.com/techdefends" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="X"
+                className="text-slate-400 hover:text-brand-500 transition-colors bg-slate-800 hover:bg-slate-700/80 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-500/50"
+              >
+                <XIcon size={18} />
               </a>
-              <a href="#" className="text-slate-400 hover:text-brand-500 transition-colors bg-slate-800 p-2 rounded-full">
-                <Facebook size={18} />
+              <a 
+                href="https://youtube.com/@techdefendsacademy?si=-WX23BF05pyRxoAf" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="YouTube"
+                className="text-slate-400 hover:text-brand-500 transition-colors bg-slate-800 hover:bg-slate-700/80 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-500/50"
+              >
+                <Youtube size={18} />
               </a>
-              <a href="#" className="text-slate-400 hover:text-brand-500 transition-colors bg-slate-800 p-2 rounded-full">
+              <a 
+                href="https://www.instagram.com/techdefends?vrfl=cTU3bDU5NG95ZHc4" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="Instagram"
+                className="text-slate-400 hover:text-brand-500 transition-colors bg-slate-800 hover:bg-slate-700/80 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-500/50"
+              >
                 <Instagram size={18} />
               </a>
             </div>
@@ -98,15 +135,25 @@ const Footer: React.FC = () => {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin className="text-brand-500 mt-1 flex-shrink-0" size={18} />
-                <span className="text-slate-400 text-sm">{COMPANY_ADDRESS}</span>
+                <span className="text-slate-400 text-sm leading-relaxed">{COMPANY_ADDRESS}</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="text-brand-500 flex-shrink-0" size={18} />
-                <span className="text-slate-400 text-sm">{COMPANY_PHONE}</span>
+                <a 
+                  href={`tel:${COMPANY_PHONE.replace(/[^0-9+]/g, '')}`} 
+                  className="text-slate-400 hover:text-brand-500 text-sm transition-colors"
+                >
+                  {COMPANY_PHONE}
+                </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="text-brand-500 flex-shrink-0" size={18} />
-                <span className="text-slate-400 text-sm">{COMPANY_EMAIL}</span>
+                <a 
+                  href={`mailto:${COMPANY_EMAIL}`} 
+                  className="text-slate-400 hover:text-brand-500 text-sm transition-colors"
+                >
+                  {COMPANY_EMAIL}
+                </a>
               </li>
             </ul>
           </div>

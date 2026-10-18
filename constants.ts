@@ -15,9 +15,9 @@ import {
 import { ServiceCategory } from './types';
 
 export const COMPANY_NAME = "TechDefends";
-export const COMPANY_PHONE = "+91 83207 45161";
+export const COMPANY_PHONE = "+91 94294 05607";
 export const COMPANY_EMAIL = "info@techdefends.com";
-export const COMPANY_ADDRESS = "819-Krupal Pathshala, Shivranjani Cross Road, Ahmedabad-Gujarat 380015";
+export const COMPANY_ADDRESS = "E-202, PNTC, Times of India Press Road, Vejalpur, Ahmedabad, Gujarat 380051";
 
 export const SERVICES: ServiceCategory[] = [
   {

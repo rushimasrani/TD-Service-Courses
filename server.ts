@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import dotenv from "dotenv";
+import { isValidStartDateKolkata } from "./utils/date";
 
 dotenv.config();
 
@@ -149,8 +150,14 @@ async function startServer() {
       github 
     } = req.body;
 
-    if (!fullName || !email || !phone || !collegeName || !domain || !duration || !statementOfPurpose) {
+    if (!fullName || !email || !phone || !collegeName || !domain || !duration || !statementOfPurpose || !startDate) {
       return res.status(400).json({ error: "Missing required fields for internship application." });
+    }
+
+    if (!isValidStartDateKolkata(startDate)) {
+      return res.status(400).json({ 
+        error: "Invalid start date. Please select a start date from tomorrow onwards." 
+      });
     }
 
     const applicationId = `TDA-2026-${Math.floor(100000 + Math.random() * 900000)}`;
