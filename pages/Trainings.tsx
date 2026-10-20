@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, GraduationCap, ArrowRight, CheckCircle, ShieldCheck, Briefcase, Sparkles } from 'lucide-react';
+import { BookOpen, GraduationCap, ArrowRight, CheckCircle, ShieldCheck, Briefcase, Sparkles, ExternalLink } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { isAcademyDomain, CrossDomainLink } from '../utils/domain';
 
 const COURSES = [
   {
@@ -95,6 +96,7 @@ const CAREER_COURSES = [
 
 const Trainings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'courses' | 'careers'>('courses');
+  const isAcademy = isAcademyDomain();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -116,11 +118,14 @@ const Trainings: React.FC = () => {
   return (
     <div className="bg-slate-50 min-h-screen pt-32 sm:pt-36 pb-16">
       <Helmet>
-        <title>Cybersecurity & IT Training | TechDefends</title>
-        <meta name="description" content="Professional cybersecurity and IT training programs. Learn AWS, CCNA, Ethical Hacking, DevOps, and SOC with hands-on labs and 100% Placement Guarantee." />
-        <link rel="canonical" href="https://techdefends.com/trainings" />
-        <meta property="og:title" content="Cybersecurity & IT Training | TechDefends" />
-        <meta property="og:description" content="Professional cybersecurity and IT training programs. Learn AWS, CCNA, Ethical Hacking, DevOps, and SOC with hands-on labs and 100% Placement Guarantee." />
+        <title>{isAcademy ? "TechDefends Academy | Cybersecurity & IT Training Hub" : "Cybersecurity & IT Training | TechDefends"}</title>
+        <meta 
+          name="description" 
+          content={isAcademy ? "TechDefends Academy: Industry-accredited cybersecurity, cloud, network engineering, and DevOps career training programs with hands-on labs and placement support." : "Professional cybersecurity and IT training programs. Learn AWS, CCNA, Ethical Hacking, DevOps, and SOC with hands-on labs and 100% Placement Guarantee."} 
+        />
+        <link rel="canonical" href={isAcademy ? "https://academy.techdefends.com/" : "https://techdefends.com/trainings"} />
+        <meta property="og:title" content={isAcademy ? "TechDefends Academy | Cybersecurity & IT Training Hub" : "Cybersecurity & IT Training | TechDefends"} />
+        <meta property="og:description" content={isAcademy ? "Industry-accredited cybersecurity, cloud, and DevOps training programs with hands-on labs and mentorship." : "Professional cybersecurity and IT training programs. Learn AWS, CCNA, Ethical Hacking, DevOps, and SOC with hands-on labs and 100% Placement Guarantee."} />
         <meta property="og:type" content="website" />
       </Helmet>
 
@@ -128,12 +133,36 @@ const Trainings: React.FC = () => {
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 animate-fade-in-up">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 border border-brand-200 text-brand-700 text-xs font-bold uppercase tracking-wider mb-4">
+            <GraduationCap size={14} />
+            <span>{isAcademy ? "TechDefends Academy Hub" : "Professional Training Hub"}</span>
+          </div>
           <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6">
-            Cybersecurity <span className="text-brand-600">Trainings</span>
+            {isAcademy ? (
+              <>TechDefends <span className="text-brand-600">Academy</span></>
+            ) : (
+              <>Cybersecurity <span className="text-brand-600">Trainings</span></>
+            )}
           </h1>
           <p className="text-lg text-slate-600">
-            Elevate your skills or launch a new career in cybersecurity with our industry-leading training programs led by active practitioners.
+            {isAcademy ? (
+              "Master in-demand cybersecurity, cloud architecture, network engineering, and DevOps skills with curriculum designed and taught by active industry practitioners."
+            ) : (
+              "Elevate your skills or launch a new career in cybersecurity with our industry-leading training programs led by active practitioners."
+            )}
           </p>
+          {isAcademy && (
+            <div className="mt-4 flex items-center justify-center gap-3">
+              <CrossDomainLink 
+                to="/" 
+                targetDomain="main" 
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-brand-600 transition-colors"
+              >
+                <span>Looking for corporate cybersecurity services? Visit main website</span>
+                <ExternalLink size={12} />
+              </CrossDomainLink>
+            </div>
+          )}
         </div>
 
         {/* 100% Placement Guarantee Banner */}

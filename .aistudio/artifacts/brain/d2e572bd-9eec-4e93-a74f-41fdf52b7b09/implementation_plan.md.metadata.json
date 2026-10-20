@@ -1,6 +1,6 @@
 {
-  "summary": "Comprehensive implementation plan for integrating the official TechDefends metallic shield logo into the Header and Footer with crisp white container backgrounds and responsive styling.",
-  "updatedAt": "2026-10-18T11:53:32.004941742Z",
+  "summary": "Corrected implementation plan for migrating the complete TechDefends Training section to academy.techdefends.com on AWS EC2 (Ubuntu) with GoDaddy DNS, Nginx reverse proxy, and environment-aware cross-domain routing.",
+  "updatedAt": "2026-10-20T13:19:15.716932813Z",
   "requestFeedback": true,
   "userFacing": true
 }

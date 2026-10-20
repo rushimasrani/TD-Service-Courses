@@ -32,6 +32,7 @@ import Healthcare from './pages/industries/Healthcare';
 
 import ChatWidget from './components/ChatWidget';
 import WhatsAppButton from './components/WhatsAppButton';
+import { isAcademyDomain } from './utils/domain';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -42,6 +43,8 @@ const ScrollToTop = () => {
 };
 
 const App: React.FC = () => {
+  const isAcademy = isAcademyDomain();
+
   return (
     <BrowserRouter>
       <ScrollToTop />
@@ -49,11 +52,16 @@ const App: React.FC = () => {
         <Navbar />
         <main className="flex-grow flex flex-col">
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
+            {/* On Academy subdomain, the root / serves the full Training Hub */}
+            <Route path="/" element={isAcademy ? <Trainings /> : <Home />} />
+            
             <Route path="/trainings/internship" element={<InternshipApplication />} />
             <Route path="/internship" element={<Navigate to="/trainings/internship" replace />} />
             <Route path="/trainings" element={<Trainings />} />
+            <Route path="/courses" element={<Trainings />} />
+            <Route path="/courses/:slug" element={<CourseDetail />} />
+
+            <Route path="/about" element={<About />} />
 
             {/* Industries */}
             <Route path="/industries/financial-services" element={<FinancialServices />} />
@@ -70,10 +78,8 @@ const App: React.FC = () => {
             <Route path="/services/microsoft-365" element={<Microsoft365Service />} />
             <Route path="/services/network-security" element={<NetworkSecurityService />} />
             <Route path="/services/:slug" element={<ServiceDetail />} />
-            <Route path="/courses" element={<Navigate to="/trainings" replace />} />
-            <Route path="/courses/:slug" element={<CourseDetail />} />
             
-            {/* Phase 6 Routes */}
+            {/* Case Studies & Resources */}
             <Route path="/case-studies" element={<CaseStudies />} />
             <Route path="/case-studies/:slug" element={<CaseStudyDetail />} />
             <Route path="/resources" element={<Resources />} />

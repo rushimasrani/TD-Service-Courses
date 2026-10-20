@@ -33,6 +33,7 @@ import {
   getDefaultStartDateKolkata, 
   isValidStartDateKolkata 
 } from '../utils/date';
+import { isAcademyDomain, CrossDomainLink } from '../utils/domain';
 
 interface FormData {
   fullName: string;
@@ -397,6 +398,8 @@ export const InternshipApplication: React.FC = () => {
     setTouched({});
   };
 
+  const isAcademy = isAcademyDomain();
+
   return (
     <div className="bg-slate-50 min-h-screen pt-32 sm:pt-36 pb-20 selection:bg-brand-600 selection:text-white">
       <Helmet>
@@ -408,17 +411,29 @@ export const InternshipApplication: React.FC = () => {
         <meta property="og:title" content="TechDefends Academy Internship Application" />
         <meta property="og:description" content="Start your journey with hands-on experience, practical projects, and mentorship from cybersecurity professionals at TechDefends." />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://techdefends.com/trainings/internship" />
+        <link rel="canonical" href={isAcademy ? "https://academy.techdefends.com/trainings/internship" : "https://techdefends.com/trainings/internship"} />
       </Helmet>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb Navigation */}
         <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-2 text-xs sm:text-sm text-slate-500">
-          <Link to="/" className="hover:text-brand-600 transition-colors">Home</Link>
-          <ChevronRight size={14} className="text-slate-400" />
-          <Link to="/trainings" className="hover:text-brand-600 transition-colors">Trainings</Link>
-          <ChevronRight size={14} className="text-slate-400" />
-          <span className="text-slate-900 font-semibold">Internship Application</span>
+          {isAcademy ? (
+            <>
+              <CrossDomainLink to="/" targetDomain="main" className="hover:text-brand-600 transition-colors">TechDefends</CrossDomainLink>
+              <ChevronRight size={14} className="text-slate-400" />
+              <Link to="/" className="hover:text-brand-600 transition-colors">Academy Hub</Link>
+              <ChevronRight size={14} className="text-slate-400" />
+              <span className="text-slate-900 font-semibold">Internship Application</span>
+            </>
+          ) : (
+            <>
+              <Link to="/" className="hover:text-brand-600 transition-colors">Home</Link>
+              <ChevronRight size={14} className="text-slate-400" />
+              <CrossDomainLink to="/trainings" targetDomain="academy" className="hover:text-brand-600 transition-colors">Trainings</CrossDomainLink>
+              <ChevronRight size={14} className="text-slate-400" />
+              <span className="text-slate-900 font-semibold">Internship Application</span>
+            </>
+          )}
         </nav>
 
         {/* Page Header */}
@@ -577,7 +592,7 @@ export const InternshipApplication: React.FC = () => {
                 Submit Another Application
               </button>
               <Link 
-                to="/trainings"
+                to={isAcademy ? "/" : "/trainings"}
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold transition-colors shadow-sm"
               >
                 Explore Training Programs <ArrowRight size={16} />

@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Linkedin, Youtube, Instagram } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Youtube, Instagram, ExternalLink } from 'lucide-react';
 import { COMPANY_ADDRESS, COMPANY_EMAIL, COMPANY_PHONE, SERVICES } from '../constants';
 import Logo from './Logo';
+import { isAcademyDomain, CrossDomainLink } from '../utils/domain';
 
 const XIcon: React.FC<{ size?: number; className?: string }> = ({ size = 18, className = "" }) => (
   <svg 
@@ -19,6 +20,7 @@ const XIcon: React.FC<{ size?: number; className?: string }> = ({ size = 18, cla
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  const isAcademy = isAcademyDomain();
 
   return (
     <footer className="bg-slate-900 text-white pt-16 pb-8 border-t border-slate-800">
@@ -27,16 +29,23 @@ const Footer: React.FC = () => {
           
           {/* Brand Info */}
           <div className="space-y-6">
-            <Link to="/" className="flex items-center gap-3 group" aria-label="TechDefends Home">
+            <Link to="/" className="flex items-center gap-3 group" aria-label={isAcademy ? "TechDefends Academy Home" : "TechDefends Home"}>
               <div className="transition-transform duration-300 group-hover:scale-105">
                 <Logo size={44} className="rounded-xl shadow-md p-1 border border-slate-700/60" />
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl font-bold leading-none text-white">
-                  Tech<span className="text-brand-500">Defends</span>
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-2xl font-bold leading-none text-white">
+                    Tech<span className="text-brand-500">Defends</span>
+                  </span>
+                  {isAcademy && (
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-brand-400 px-1 py-0.5 bg-brand-950/80 rounded border border-brand-800">
+                      Academy
+                    </span>
+                  )}
+                </div>
                 <span className="text-[0.55rem] sm:text-[0.65rem] font-medium tracking-widest uppercase mt-1 text-slate-400 group-hover:text-brand-400 transition-colors">
-                  Secure Today, Scale Tomorrow
+                  {isAcademy ? "Cybersecurity & IT Training Hub" : "Secure Today, Scale Tomorrow"}
                 </span>
               </div>
             </Link>
@@ -102,30 +111,60 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="text-lg font-semibold mb-6 border-b border-brand-900 pb-2 inline-block">Quick Links</h3>
             <ul className="space-y-3">
-              <li><Link to="/" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Home</Link></li>
-              <li><Link to="/about" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">About Us</Link></li>
-
-              <li><Link to="/case-studies" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Case Studies</Link></li>
-              <li><Link to="/resources" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Resources</Link></li>
-
-              <li><Link to="/careers" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Careers</Link></li>
-              <li><Link to="/contact" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Contact Us</Link></li>
-              <li><Link to="/contact" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Request Consultation</Link></li>
-              <li><Link to="/privacy-policy" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Privacy Policy</Link></li>
+              {isAcademy ? (
+                <>
+                  <li><Link to="/" className="text-slate-400 hover:text-brand-500 text-sm transition-colors font-medium text-white">Training Hub</Link></li>
+                  <li><Link to="/trainings" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">All Programs</Link></li>
+                  <li><Link to="/trainings/internship" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Internship Application</Link></li>
+                  <li>
+                    <CrossDomainLink to="/" targetDomain="main" className="text-slate-400 hover:text-brand-500 text-sm transition-colors flex items-center gap-1.5">
+                      <span>TechDefends Corporate</span>
+                      <ExternalLink size={12} className="text-slate-500" />
+                    </CrossDomainLink>
+                  </li>
+                  <li><CrossDomainLink to="/about" targetDomain="main" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">About TechDefends</CrossDomainLink></li>
+                  <li><CrossDomainLink to="/contact" targetDomain="main" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Contact Us</CrossDomainLink></li>
+                  <li><Link to="/privacy-policy" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Privacy Policy</Link></li>
+                </>
+              ) : (
+                <>
+                  <li><Link to="/" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Home</Link></li>
+                  <li><Link to="/about" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">About Us</Link></li>
+                  <li><CrossDomainLink to="/trainings" targetDomain="academy" className="text-brand-400 hover:text-brand-300 text-sm transition-colors font-medium flex items-center gap-1.5"><span>TechDefends Academy</span><ExternalLink size={12} /></CrossDomainLink></li>
+                  <li><CrossDomainLink to="/trainings/internship" targetDomain="academy" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Internship Program</CrossDomainLink></li>
+                  <li><Link to="/case-studies" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Case Studies</Link></li>
+                  <li><Link to="/resources" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Resources</Link></li>
+                  <li><Link to="/careers" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Careers</Link></li>
+                  <li><Link to="/contact" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Contact Us</Link></li>
+                  <li><Link to="/privacy-policy" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Privacy Policy</Link></li>
+                </>
+              )}
             </ul>
           </div>
 
-          {/* Services */}
+          {/* Services / Programs */}
           <div>
-            <h3 className="text-lg font-semibold mb-6 border-b border-brand-900 pb-2 inline-block">Core Services</h3>
+            <h3 className="text-lg font-semibold mb-6 border-b border-brand-900 pb-2 inline-block">
+              {isAcademy ? "Top Programs" : "Core Services"}
+            </h3>
             <ul className="space-y-3">
-              {SERVICES.slice(0, 5).map(service => (
-                <li key={service.id}>
-                  <Link to={`/services/${service.id}`} className="text-slate-400 hover:text-brand-500 text-sm transition-colors">
-                    {service.title}
-                  </Link>
-                </li>
-              ))}
+              {isAcademy ? (
+                <>
+                  <li><Link to="/courses/aws-solution-architect" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">AWS Solution Architect</Link></li>
+                  <li><Link to="/courses/elite-offensive-security" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Ethical Hacking & VAPT</Link></li>
+                  <li><Link to="/courses/devops-master-program" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Cloud & DevOps Master</Link></li>
+                  <li><Link to="/courses/soc-monitoring-incident-response" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">SOC Monitoring & IR</Link></li>
+                  <li><Link to="/courses/network-engineering-diploma" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Network Engineering</Link></li>
+                </>
+              ) : (
+                SERVICES.slice(0, 5).map(service => (
+                  <li key={service.id}>
+                    <Link to={`/services/${service.id}`} className="text-slate-400 hover:text-brand-500 text-sm transition-colors">
+                      {service.title}
+                    </Link>
+                  </li>
+                ))
+              )}
             </ul>
           </div>
 

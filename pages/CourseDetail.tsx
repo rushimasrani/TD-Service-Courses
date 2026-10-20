@@ -5,6 +5,7 @@ import { ArrowRight, CheckCircle, Clock, ShieldCheck, Terminal, Target, HeartHan
 import jsPDF from 'jspdf';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
+import { isAcademyDomain } from '../utils/domain';
 
 const TESTIMONIALS = [
   {
@@ -757,13 +758,15 @@ const CourseDetail: React.FC = () => {
     window.scrollTo(0, 0);
   }, [slug]);
 
+  const isAcademy = isAcademyDomain();
+
   if (!course) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-4">Course not found</h2>
-          <Link to="/trainings?tab=courses" className="text-brand-600 hover:text-brand-700 underline">
-            Return to Trainings
+          <Link to={isAcademy ? "/" : "/trainings?tab=courses"} className="text-brand-600 hover:text-brand-700 underline">
+            Return to {isAcademy ? "Training Hub" : "Trainings"}
           </Link>
         </div>
       </div>
@@ -774,10 +777,10 @@ const CourseDetail: React.FC = () => {
     <div className="bg-slate-50 min-h-screen pt-28 pb-16">
 
       <Helmet>
-        <title>{course?.title || 'Training Program'} | TechDefends</title>
+        <title>{course?.title || 'Training Program'} | {isAcademy ? "TechDefends Academy" : "TechDefends"}</title>
         <meta name="description" content={course?.overview?.substring(0, 160) || ''} />
-        <link rel="canonical" href={`https://techdefends.com/courses/${slug}`} />
-        <meta property="og:title" content={`${course?.title} `} />
+        <link rel="canonical" href={isAcademy ? `https://academy.techdefends.com/courses/${slug}` : `https://techdefends.com/courses/${slug}`} />
+        <meta property="og:title" content={`${course?.title} | ${isAcademy ? "TechDefends Academy" : "TechDefends"}`} />
         <meta property="og:description" content={course?.overview?.substring(0, 160) || ''} />
         <meta property="og:type" content="website" />
         {generateSchema() && <script type="application/ld+json">{generateSchema()}</script>}

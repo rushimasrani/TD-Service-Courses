@@ -70,7 +70,59 @@ async function startServer() {
 
   app.use(express.json());
 
-  
+  // CORS middleware supporting techdefends.com and academy.techdefends.com
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    const allowedOrigins = [
+      'https://techdefends.com',
+      'https://www.techdefends.com',
+      'https://academy.techdefends.com',
+      'http://techdefends.com',
+      'http://www.techdefends.com',
+      'http://academy.techdefends.com'
+    ];
+
+    if (origin) {
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1') ||
+        origin.endsWith('.run.app')
+      ) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+      }
+    }
+
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(204);
+    }
+    next();
+  });
+
+  // Flag-gated 301 Migration Redirects (enabled when ENABLE_ACADEMY_REDIRECTS=true in .env)
+  if (process.env.ENABLE_ACADEMY_REDIRECTS === 'true') {
+    app.use((req, res, next) => {
+      const host = (req.headers.host || '').toLowerCase();
+      // Only redirect if arriving on the main domain (not academy subdomain)
+      if (host.includes('techdefends.com') && !host.startsWith('academy.')) {
+        const p = req.path.toLowerCase();
+        if (
+          p === '/trainings' ||
+          p.startsWith('/trainings/') ||
+          p === '/courses' ||
+          p.startsWith('/courses/') ||
+          p === '/internship'
+        ) {
+          return res.redirect(301, `https://academy.techdefends.com${req.originalUrl}`);
+        }
+      }
+      next();
+    });
+  }
+
   // Legacy 301 Redirects
   app.get('/services/offensive-security', (req, res) => res.redirect(301, '/services/vapt'));
   app.get('/services/defensive-security', (req, res) => res.redirect(301, '/services/managed-soc'));

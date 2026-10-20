@@ -10,6 +10,7 @@ import NewsCard from '../components/NewsCard';
 import { Reveal } from '../components/Reveal';
 import TechnologyEcosystem from '../components/TechnologyEcosystem';
 import { Server, GraduationCap, FileText, LayoutGrid, ShieldCheck } from 'lucide-react';
+import { CrossDomainLink } from '../utils/domain';
 
 
 const Home: React.FC = () => {
@@ -369,9 +370,9 @@ const Home: React.FC = () => {
                 </ul>
               </Reveal>
               <Reveal delay={0.3}>
-                <Link to="/trainings" className="inline-flex px-6 py-3 bg-slate-900 text-white font-bold rounded-lg hover:bg-slate-800 transition-colors">
+                <CrossDomainLink to="/trainings" targetDomain="academy" className="inline-flex px-6 py-3 bg-slate-900 text-white font-bold rounded-lg hover:bg-slate-800 transition-colors">
                   Explore Training Programs
-                </Link>
+                </CrossDomainLink>
               </Reveal>
             </div>
             <div className="relative">
