@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { SecurityCheckReport, SecurityFinding } from '../server/securityScanner';
 import { isScannerDomain, getMainSiteUrl } from '../utils/domain';
+import { isPhp2ShellExposureIdentified, sortSecurityFindings } from '../data/phpAdvisories';
 
 const SCAN_STEPS = [
   'Validating target URL & enforcing SSRF boundaries...',
@@ -62,6 +63,7 @@ export const SecurityCheck: React.FC = () => {
     }
 
     setError(null);
+    setReport(null); // Clear previous scan report immediately to prevent stale findings
     setIsLoading(true);
     setScanStepIndex(0);
 
@@ -87,10 +89,12 @@ export const SecurityCheck: React.FC = () => {
         throw new Error(data.error || 'Security check failed. Please check the URL and try again.');
       }
 
-      setReport(data.report);
-      // Auto expand first 2 findings
+      const sorted = sortSecurityFindings(data.report.findings, data.report.phpAssessment);
+      setReport({ ...data.report, findings: sorted });
+
+      // Auto expand top 2 findings
       const initialExpanded: Record<string, boolean> = {};
-      data.report.findings.slice(0, 3).forEach((f: SecurityFinding) => {
+      sorted.slice(0, 2).forEach((f: SecurityFinding) => {
         initialExpanded[f.id] = true;
       });
       setExpandedFindings(initialExpanded);
@@ -103,14 +107,15 @@ export const SecurityCheck: React.FC = () => {
     }
   };
 
-  const filteredFindings = report?.findings.filter(f => {
+  const findingsList = report ? sortSecurityFindings(report.findings, report.phpAssessment) : [];
+  const filteredFindings = findingsList.filter(f => {
     if (selectedCategory === 'All') return true;
     if (selectedCategory === 'Advisories & Attention') return f.status === 'Advisory' || f.status === 'Attention';
     if (selectedCategory === 'Security Headers') return f.category === 'Security Headers';
     if (selectedCategory === 'PHP & Advisories') return f.category === 'PHP & Advisory Heuristics';
     if (selectedCategory === 'TLS & Encryption') return f.category === 'TLS & Encryption';
     return true;
-  }) || [];
+  });
 
   return (
     <div className="bg-slate-50 min-h-screen pt-32 sm:pt-36 pb-20 selection:bg-brand-600 selection:text-white">
@@ -173,39 +178,43 @@ export const SecurityCheck: React.FC = () => {
               <label htmlFor="target-url" className="block text-sm font-bold text-slate-900 mb-2">
                 Target Website URL <span className="text-brand-600">*</span>
               </label>
-              <div className="relative rounded-xl shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                  <Globe size={18} />
-                </div>
-                <input
-                  id="target-url"
-                  type="text"
-                  value={urlInput}
-                  onChange={(e) => setUrlInput(e.target.value)}
-                  placeholder="e.g. https://yourcompany.com or yourcompany.com"
-                  disabled={isLoading}
-                  className="block w-full pl-11 pr-32 py-3.5 sm:text-base border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 disabled:bg-slate-100 disabled:cursor-not-allowed transition-all"
-                />
-                <div className="absolute inset-y-0 right-1.5 flex items-center">
-                  <button
-                    type="submit"
+
+              {/* Responsive URL Input and Submit Button */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="relative flex-1 min-w-0">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                    <Globe size={18} />
+                  </div>
+                  <input
+                    id="target-url"
+                    type="text"
+                    value={urlInput}
+                    onChange={(e) => setUrlInput(e.target.value)}
+                    placeholder="e.g. https://yourcompany.com or yourcompany.com"
                     disabled={isLoading}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-lg transition-all shadow-md shadow-brand-900/20 disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {isLoading ? (
-                      <>
-                        <RefreshCw size={16} className="animate-spin" />
-                        <span>Inspecting...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Search size={16} />
-                        <span>Check Website</span>
-                      </>
-                    )}
-                  </button>
+                    className="block w-full pl-11 pr-4 py-3.5 text-sm sm:text-base border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 disabled:bg-slate-100 disabled:cursor-not-allowed transition-all shadow-sm"
+                  />
                 </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full sm:w-auto flex-shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm sm:text-base rounded-xl transition-all shadow-md shadow-brand-900/20 disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                  {isLoading ? (
+                    <>
+                      <RefreshCw size={16} className="animate-spin" />
+                      <span>Inspecting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Search size={16} />
+                      <span>Check Website</span>
+                    </>
+                  )}
+                </button>
               </div>
+
               <p className="text-xs text-slate-500 mt-2">
                 Standard web ports (80, 443) only. Internal IPs, link-local addresses, and cloud metadata endpoints are strictly blocked by SSRF guards.
               </p>
@@ -219,9 +228,9 @@ export const SecurityCheck: React.FC = () => {
                   checked={authorized}
                   onChange={(e) => setAuthorized(e.target.checked)}
                   disabled={isLoading}
-                  className="mt-1 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer"
+                  className="mt-0.5 sm:mt-1 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer flex-shrink-0"
                 />
-                <span className="text-xs sm:text-sm text-slate-700 leading-normal">
+                <span className="text-xs sm:text-sm text-slate-700 leading-normal break-words">
                   <strong className="text-slate-900">Mandatory Authorization:</strong> I confirm that I own this website or have explicit, authorized permission to assess its public security posture. I acknowledge that TechDefends performs bounded, passive HTTP observations only.
                 </span>
               </label>
@@ -314,67 +323,95 @@ export const SecurityCheck: React.FC = () => {
               </div>
             </div>
 
-            {/* PHP2Shell Spotlight Panel */}
-            <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-700">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-700 gap-2">
-                <div className="flex items-center gap-2">
-                  <Cpu className="text-brand-500" size={22} />
-                  <h3 className="text-lg font-bold">PHP & PHP2Shell Exposure Assessment</h3>
+            {/* Conditional PHP2Shell Spotlight Panel — rendered ONLY when PHP2Shell exposure is identified */}
+            {isPhp2ShellExposureIdentified(report.phpAssessment) && (
+              <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-700 animate-fade-in">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-700 gap-2">
+                  <div className="flex items-center gap-2">
+                    <Cpu className="text-brand-500" size={22} />
+                    <h3 className="text-lg font-bold">PHP & PHP2Shell Exposure Assessment</h3>
+                  </div>
+                  <div className="text-xs text-slate-400 font-mono">
+                    Advisory Dataset: {new Date(report.advisoryDatasetTimestamp).toLocaleDateString()}
+                  </div>
                 </div>
-                <div className="text-xs text-slate-400 font-mono">
-                  Advisory Dataset: {new Date(report.advisoryDatasetTimestamp).toLocaleDateString()}
-                </div>
-              </div>
 
-              <div className="space-y-4">
-                <div className="bg-slate-800/90 rounded-xl p-4 border border-slate-700">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs uppercase font-extrabold tracking-wider px-2 py-0.5 rounded bg-brand-900/60 text-brand-400 border border-brand-700/60">
-                      Verdict
-                    </span>
-                    <span className="text-sm font-bold text-white">
-                      {report.phpAssessment.verdictLabel}
-                    </span>
+                <div className="space-y-4">
+                  <div className="bg-slate-800/90 rounded-xl p-4 border border-slate-700">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <span className="text-xs uppercase font-extrabold tracking-wider px-2 py-0.5 rounded bg-brand-900/60 text-brand-400 border border-brand-700/60">
+                        Verdict
+                      </span>
+                      <span className="text-sm font-bold text-white break-words">
+                        {report.phpAssessment.verdictLabel}
+                      </span>
+                    </div>
+
+                    <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-3 break-words">
+                      {report.phpAssessment.explanation}
+                    </p>
+
+                    <div className="text-xs text-slate-400 bg-slate-900/80 p-3 rounded-lg border border-slate-700 font-mono space-y-1">
+                      <div className="font-semibold text-slate-300">Observed Signals:</div>
+                      {report.phpAssessment.evidence.map((ev, i) => (
+                        <div key={i} className="break-words">• {ev}</div>
+                      ))}
+                    </div>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-3">
-                    {report.phpAssessment.explanation}
+                  {/* Fixed Version Thresholds */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-xs">
+                    <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700/80">
+                      <div className="text-slate-400 font-semibold mb-0.5">PHP 8.2 Fixed In</div>
+                      <div className="font-mono text-emerald-400 font-bold">8.2.35+</div>
+                    </div>
+                    <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700/80">
+                      <div className="text-slate-400 font-semibold mb-0.5">PHP 8.3 Fixed In</div>
+                      <div className="font-mono text-emerald-400 font-bold">8.3.36+</div>
+                    </div>
+                    <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700/80">
+                      <div className="text-slate-400 font-semibold mb-0.5">PHP 8.4 Fixed In</div>
+                      <div className="font-mono text-emerald-400 font-bold">8.4.27+</div>
+                    </div>
+                    <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700/80">
+                      <div className="text-slate-400 font-semibold mb-0.5">PHP 8.5 Fixed In</div>
+                      <div className="font-mono text-emerald-400 font-bold">8.5.12+</div>
+                    </div>
+                  </div>
+
+                  {/* Important Vendor Backport Note */}
+                  <div className="bg-amber-950/40 border-l-4 border-amber-500 p-3 rounded-r-lg text-xs text-amber-200 break-words">
+                    <strong>Important Caveat for Linux Distributions:</strong> Ubuntu, Debian, and RHEL package maintainers frequently backport security patches into release builds (e.g. <code>8.3.6-0ubuntu0.24.04.1</code>) without changing the upstream version string. Public headers alone cannot verify internal package changelogs.
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Neutral callout when PHP is detected without an exposed version string */}
+            {report.phpAssessment.verdict === 'PHP_DETECTED_NO_VERSION' && (
+              <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 sm:p-5 flex items-start gap-3.5 text-sky-900 animate-fade-in">
+                <Info className="text-sky-600 flex-shrink-0 mt-0.5" size={20} />
+                <div className="text-xs sm:text-sm">
+                  <h4 className="font-bold mb-1">PHP Runtime Detected — Version Safely Suppressed</h4>
+                  <p className="text-sky-800 leading-relaxed">
+                    Passive inspection detected PHP indicators (such as session cookies or backend signatures), but the exact version string is properly suppressed. Suppressing version disclosures is an effective defense-in-depth practice. Because the version is hidden, external PHP2Shell advisory applicability cannot be confirmed without authenticated server-side verification.
                   </p>
-
-                  <div className="text-xs text-slate-400 bg-slate-900/80 p-3 rounded-lg border border-slate-700 font-mono space-y-1">
-                    <div className="font-semibold text-slate-300">Observed Signals:</div>
-                    {report.phpAssessment.evidence.map((ev, i) => (
-                      <div key={i}>• {ev}</div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Fixed Version Thresholds */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700/80">
-                    <div className="text-slate-400 font-semibold mb-0.5">PHP 8.2 Fixed In</div>
-                    <div className="font-mono text-emerald-400 font-bold">8.2.35+</div>
-                  </div>
-                  <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700/80">
-                    <div className="text-slate-400 font-semibold mb-0.5">PHP 8.3 Fixed In</div>
-                    <div className="font-mono text-emerald-400 font-bold">8.3.36+</div>
-                  </div>
-                  <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700/80">
-                    <div className="text-slate-400 font-semibold mb-0.5">PHP 8.4 Fixed In</div>
-                    <div className="font-mono text-emerald-400 font-bold">8.4.27+</div>
-                  </div>
-                  <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700/80">
-                    <div className="text-slate-400 font-semibold mb-0.5">PHP 8.5 Fixed In</div>
-                    <div className="font-mono text-emerald-400 font-bold">8.5.12+</div>
-                  </div>
-                </div>
-
-                {/* Important Vendor Backport Note */}
-                <div className="bg-amber-950/40 border-l-4 border-amber-500 p-3 rounded-r-lg text-xs text-amber-200">
-                  <strong>Important Caveat for Linux Distributions:</strong> Ubuntu, Debian, and RHEL package maintainers frequently backport security patches into release builds (e.g. <code>8.3.6-0ubuntu0.24.04.1</code>) without changing the upstream version string. Public headers alone cannot verify internal package changelogs.
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Neutral callout when target version formatting is non-standard */}
+            {report.phpAssessment.verdict === 'UNABLE_TO_DETERMINE' && (
+              <div className="bg-slate-100 border border-slate-300 rounded-xl p-4 sm:p-5 flex items-start gap-3.5 text-slate-800 animate-fade-in">
+                <HelpCircle className="text-slate-500 flex-shrink-0 mt-0.5" size={20} />
+                <div className="text-xs sm:text-sm">
+                  <h4 className="font-bold mb-1">PHP Assessment Inconclusive</h4>
+                  <p className="text-slate-600 leading-relaxed">
+                    The target returned non-standard technology headers that could not be mapped to known PHP version releases. Further internal server inspection is recommended to confirm patch status.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Filter Tabs */}
             <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3">
@@ -410,27 +447,38 @@ export const SecurityCheck: React.FC = () => {
                   >
                     <div 
                       onClick={() => toggleFinding(finding.id)}
-                      className="p-5 flex items-center justify-between cursor-pointer hover:bg-slate-50/60 rounded-xl transition-colors"
+                      className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 cursor-pointer hover:bg-slate-50/60 rounded-xl transition-colors"
                     >
-                      <div className="flex items-center gap-3">
-                        {isPass && <CheckCircle size={20} className="text-emerald-500 flex-shrink-0" />}
-                        {isAttention && <AlertTriangle size={20} className="text-amber-500 flex-shrink-0" />}
-                        {isAdvisory && <ShieldAlert size={20} className="text-brand-600 flex-shrink-0" />}
-                        {finding.status === 'Informational' && <Info size={20} className="text-slate-400 flex-shrink-0" />}
+                      <div className="flex items-start gap-3 min-w-0 flex-1">
+                        <div className="mt-0.5 flex-shrink-0">
+                          {isPass && <CheckCircle size={20} className="text-emerald-500" />}
+                          {isAttention && <AlertTriangle size={20} className="text-amber-500" />}
+                          {isAdvisory && <ShieldAlert size={20} className="text-brand-600" />}
+                          {finding.status === 'Informational' && <Info size={20} className="text-slate-400" />}
+                        </div>
 
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="text-sm font-bold text-slate-900">{finding.name}</h4>
-                            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="text-sm font-bold text-slate-900 break-words">{finding.name}</h4>
+                            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 whitespace-nowrap">
                               {finding.category}
                             </span>
+                            {finding.severity && finding.severity !== 'Informational' && (
+                              <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded whitespace-nowrap ${
+                                finding.severity === 'Critical' ? 'bg-red-100 text-red-800 border border-red-300' :
+                                finding.severity === 'High' ? 'bg-orange-100 text-orange-800 border border-orange-300' :
+                                'bg-amber-100 text-amber-800 border border-amber-300'
+                              }`}>
+                                {finding.severity}
+                              </span>
+                            )}
                           </div>
-                          <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{finding.evidence}</p>
+                          <p className="text-xs text-slate-500 mt-1 line-clamp-2 break-words">{finding.evidence}</p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded ${
+                      <div className="flex items-center justify-between sm:justify-end gap-3 flex-shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                        <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded whitespace-nowrap ${
                           isPass ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
                           isAdvisory ? 'bg-red-50 text-red-700 border border-red-200' :
                           isAttention ? 'bg-amber-50 text-amber-700 border border-amber-200' :
@@ -438,41 +486,44 @@ export const SecurityCheck: React.FC = () => {
                         }`}>
                           {finding.status}
                         </span>
-                        {isExpanded ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
+                        <div className="flex items-center gap-1 text-slate-400 text-xs font-semibold">
+                          <span className="sm:hidden">{isExpanded ? 'Hide' : 'Details'}</span>
+                          {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        </div>
                       </div>
                     </div>
 
                     {/* Expanded Detail Panel */}
                     {isExpanded && (
-                      <div className="px-5 pb-5 pt-2 border-t border-slate-100 space-y-3.5 text-xs sm:text-sm animate-fade-in">
+                      <div className="px-4 sm:px-5 pb-5 pt-3 border-t border-slate-100 space-y-4 text-xs sm:text-sm animate-fade-in">
                         <div>
                           <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Observed Evidence</div>
-                          <div className="p-2.5 bg-slate-900 text-emerald-400 font-mono text-xs rounded-lg overflow-x-auto">
+                          <div className="p-3 bg-slate-900 text-emerald-400 font-mono text-xs rounded-lg overflow-x-auto break-all sm:break-normal">
                             {finding.evidence}
                           </div>
                         </div>
 
                         <div>
                           <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Assessment & Explanation</div>
-                          <p className="text-slate-700 leading-relaxed">{finding.explanation}</p>
+                          <p className="text-slate-700 leading-relaxed break-words">{finding.explanation}</p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                            <div className="text-xs font-bold text-slate-900 mb-1 flex items-center gap-1.5">
-                              <Sparkles size={14} className="text-brand-600" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                          <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+                            <div className="text-xs font-bold text-slate-900 mb-1.5 flex items-center gap-1.5">
+                              <Sparkles size={14} className="text-brand-600 flex-shrink-0" />
                               <span>Remediation Advice</span>
                             </div>
-                            <p className="text-xs text-slate-600 whitespace-pre-line leading-relaxed">{finding.remediation}</p>
+                            <p className="text-xs text-slate-600 whitespace-pre-line leading-relaxed break-words">{finding.remediation}</p>
                           </div>
 
-                          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                            <div className="text-xs font-bold text-slate-900 mb-1 flex items-center gap-1.5">
-                              <HelpCircle size={14} className="text-slate-500" />
+                          <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+                            <div className="text-xs font-bold text-slate-900 mb-1.5 flex items-center gap-1.5">
+                              <HelpCircle size={14} className="text-slate-500 flex-shrink-0" />
                               <span>Known Limitations & Verification Level</span>
                             </div>
-                            <p className="text-xs text-slate-600 leading-relaxed mb-1.5">{finding.limitations}</p>
-                            <span className="text-[10px] font-semibold text-slate-500 bg-slate-200/70 px-2 py-0.5 rounded">
+                            <p className="text-xs text-slate-600 leading-relaxed mb-2 break-words">{finding.limitations}</p>
+                            <span className="inline-block text-[10px] font-semibold text-slate-600 bg-slate-200/70 px-2 py-0.5 rounded">
                               Confidence: {finding.confidence}
                             </span>
                           </div>

@@ -138,6 +138,83 @@ export interface PhpAssessmentResult {
   remediationAdvice: string;
   knownLimitations: string[];
   advisoryDatasetTimestamp: string;
+  hasExposureSignal?: boolean;
+}
+
+/**
+ * Checks if a scan assessment indicates confirmed or potentially affected PHP2Shell exposure
+ * (CVE-2026-109618 / CVE-2026-109619).
+ */
+export function isPhp2ShellExposureIdentified(assessment: PhpAssessmentResult | null | undefined): boolean {
+  if (!assessment) return false;
+  return assessment.verdict === 'POTENTIALLY_AFFECTED';
+}
+
+/**
+ * Centralized, deterministic ordering of security check findings:
+ * 1. PHP2Shell & PHP Exposure Assessment — first when applicable
+ * 2. Other PHP-related findings and advisory information
+ * 3. Security response headers (CSP, HSTS, XFO, XCTO, Referrer-Policy)
+ * 4. General website security observations (TLS & Encryption, server disclosure, etc.)
+ */
+export function sortSecurityFindings<T extends { id: string; category: string; name: string; evidence: string; status: string }>(
+  findings: T[],
+  phpAssessment?: { verdict: string } | null
+): T[] {
+  const isPhpApplicable = phpAssessment
+    ? phpAssessment.verdict !== 'NO_PHP_INDICATORS'
+    : findings.some(f => 
+        (f.id === 'php2shell-exposure-check' || f.category === 'PHP & Advisory Heuristics') && 
+        f.status !== 'Pass'
+      );
+
+  const getFindingPriority = (f: T): number => {
+    const isPhp2Shell = f.id === 'php2shell-exposure-check' || f.name.toLowerCase().includes('php2shell');
+    const isPhpRelated = f.category === 'PHP & Advisory Heuristics' ||
+      f.name.toLowerCase().includes('php') ||
+      (f.id === 'tech-powered-by-header' && /php/i.test(f.evidence));
+
+    if (isPhpApplicable) {
+      if (isPhp2Shell) return 1;
+      if (isPhpRelated) return 2;
+      if (f.category === 'Security Headers') return 3;
+      return 4;
+    } else {
+      if (f.category === 'Security Headers') return 1;
+      if (f.category === 'TLS & Encryption' || f.category === 'Technology Disclosure') return 2;
+      return 3;
+    }
+  };
+
+  const headerPriorityMap: Record<string, number> = {
+    'header-csp': 1,
+    'header-hsts': 2,
+    'header-xfo': 3,
+    'header-xcto': 4,
+    'header-referrer': 5
+  };
+
+  return [...findings].sort((a, b) => {
+    const prioA = getFindingPriority(a);
+    const prioB = getFindingPriority(b);
+    if (prioA !== prioB) {
+      return prioA - prioB;
+    }
+
+    if (a.category === 'Security Headers' && b.category === 'Security Headers') {
+      const getHeaderSubPriority = (id: string) => {
+        for (const [key, val] of Object.entries(headerPriorityMap)) {
+          if (id.startsWith(key)) return val;
+        }
+        return 99;
+      };
+      const subA = getHeaderSubPriority(a.id);
+      const subB = getHeaderSubPriority(b.id);
+      if (subA !== subB) return subA - subB;
+    }
+
+    return a.id.localeCompare(b.id);
+  });
 }
 
 /**

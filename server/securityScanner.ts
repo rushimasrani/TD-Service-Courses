@@ -19,7 +19,7 @@ import http from 'http';
 import https from 'https';
 import { TLSSocket } from 'tls';
 import { validateTargetUrl, createPinnedAgent } from '../utils/ssrfValidator';
-import { evaluatePhpExposure, PhpAssessmentResult, PHP_ADVISORY_DATASET_TIMESTAMP } from '../data/phpAdvisories';
+import { evaluatePhpExposure, PhpAssessmentResult, PHP_ADVISORY_DATASET_TIMESTAMP, sortSecurityFindings } from '../data/phpAdvisories';
 
 export interface SecurityFinding {
   id: string;
@@ -595,6 +595,9 @@ export async function runSecurityCheck(rawUrl: string): Promise<SecurityCheckRep
     informational: findings.filter(f => f.status === 'Informational').length
   };
 
+  // Apply deterministic finding ordering
+  const sortedFindings = sortSecurityFindings(findings, phpAssessment);
+
   return {
     targetUrl: currentUrl.href,
     finalUrl: currentUrl.href,
@@ -604,7 +607,7 @@ export async function runSecurityCheck(rawUrl: string): Promise<SecurityCheckRep
     httpStatus: finalResponse.statusCode,
     tlsInfo,
     phpAssessment,
-    findings,
+    findings: sortedFindings,
     summary,
     disclaimer: 'TechDefends Security Check conducts strictly passive, bounded external observation. It does not send exploit payloads, test RCE conditions, or inspect server-side package changelogs. An advisory finding indicates version signal exposure rather than confirmed server exploitability; conversely, absence of indicators does not guarantee absolute security.',
     advisoryDatasetTimestamp: PHP_ADVISORY_DATASET_TIMESTAMP
