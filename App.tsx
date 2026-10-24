@@ -23,6 +23,7 @@ import ResourceDetail from './pages/ResourceDetail';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Trainings from './pages/Trainings';
 import InternshipApplication from './pages/InternshipApplication';
+import SecurityCheck from './pages/SecurityCheck';
 
 import FinancialServices from './pages/industries/FinancialServices';
 import CAFirms from './pages/industries/CAFirms';
@@ -32,19 +33,31 @@ import Healthcare from './pages/industries/Healthcare';
 
 import ChatWidget from './components/ChatWidget';
 import WhatsAppButton from './components/WhatsAppButton';
-import { isAcademyDomain } from './utils/domain';
+import { isAcademyDomain, isScannerDomain } from './utils/domain';
 
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [pathname]);
+  }, [pathname, search]);
   return null;
 };
 
-const App: React.FC = () => {
-  const isAcademy = isAcademyDomain();
+const RootRouteElement: React.FC = () => {
+  const location = useLocation();
+  const isAcademy = isAcademyDomain(location.search);
+  const isScanner = isScannerDomain(location.search);
 
+  if (isScanner) {
+    return <SecurityCheck />;
+  }
+  if (isAcademy) {
+    return <Trainings />;
+  }
+  return <Home />;
+};
+
+const App: React.FC = () => {
   return (
     <BrowserRouter>
       <ScrollToTop />
@@ -52,8 +65,10 @@ const App: React.FC = () => {
         <Navbar />
         <main className="flex-grow flex flex-col">
           <Routes>
-            {/* On Academy subdomain, the root / serves the full Training Hub */}
-            <Route path="/" element={isAcademy ? <Trainings /> : <Home />} />
+            {/* On Scanner subdomain (php2shell.techdefends.com or ?subdomain=php2shell), root serves Security Check */}
+            {/* On Academy subdomain (academy.techdefends.com or ?subdomain=academy), root serves Training Hub */}
+            {/* On Main corporate domain, root serves Home */}
+            <Route path="/" element={<RootRouteElement />} />
             
             <Route path="/trainings/internship" element={<InternshipApplication />} />
             <Route path="/internship" element={<Navigate to="/trainings/internship" replace />} />
@@ -84,6 +99,7 @@ const App: React.FC = () => {
             <Route path="/case-studies/:slug" element={<CaseStudyDetail />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/resources/:slug" element={<ResourceDetail />} />
+            <Route path="/security-check" element={<SecurityCheck />} />
 
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           </Routes>

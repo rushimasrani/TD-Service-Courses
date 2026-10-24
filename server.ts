@@ -2,8 +2,30 @@ import express from "express";
 import path from "path";
 import dotenv from "dotenv";
 import { isValidStartDateKolkata } from "./utils/date";
+import { runSecurityCheck } from "./server/securityScanner";
 
 dotenv.config();
+
+// In-memory rate limiting and concurrency control for security scanner
+const scanRateLimitMap = new Map<string, number[]>();
+const MAX_SCANS_PER_WINDOW = 10;
+const SCAN_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+
+let activeScanCount = 0;
+const MAX_CONCURRENT_SCANS = 3;
+
+function checkScanRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = scanRateLimitMap.get(ip) || [];
+  const recent = timestamps.filter(t => now - t < SCAN_WINDOW_MS);
+  if (recent.length >= MAX_SCANS_PER_WINDOW) {
+    scanRateLimitMap.set(ip, recent);
+    return false;
+  }
+  recent.push(now);
+  scanRateLimitMap.set(ip, recent);
+  return true;
+}
 
 async function getGraphToken(tenantId: string, clientId: string, clientSecret: string) {
   const url = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`;
@@ -273,6 +295,51 @@ async function startServer() {
     } catch (error: any) {
       console.error("Error processing internship application:", error);
       return res.status(500).json({ error: "Failed to process internship application.", details: error.message || String(error) });
+    }
+  });
+
+  // API Route for TechDefends Security Check
+  app.post("/api/security-check", async (req, res) => {
+    const url = req.body?.url || req.body?.targetUrl;
+    const authorized = req.body?.authorized;
+
+    if (!authorized) {
+      return res.status(400).json({
+        error: "Authorization required: Please confirm that you own this website or have explicit authorization to assess it."
+      });
+    }
+
+    if (!url || typeof url !== 'string' || !url.trim()) {
+      return res.status(400).json({
+        error: "A valid website URL is required (e.g. https://example.com)."
+      });
+    }
+
+    const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress || 'unknown';
+
+    if (!checkScanRateLimit(clientIp)) {
+      return res.status(429).json({
+        error: "Rate limit exceeded. To protect service availability, maximum 10 assessments are allowed per 10 minutes per IP. Please try again shortly."
+      });
+    }
+
+    if (activeScanCount >= MAX_CONCURRENT_SCANS) {
+      return res.status(503).json({
+        error: "The scanner is currently processing the maximum number of concurrent scans. Please retry in a few moments."
+      });
+    }
+
+    activeScanCount++;
+    try {
+      const report = await runSecurityCheck(url.trim());
+      return res.status(200).json({ success: true, report });
+    } catch (err: any) {
+      const msg = err.message || "Failed to inspect the target website.";
+      return res.status(400).json({
+        error: msg
+      });
+    } finally {
+      activeScanCount = Math.max(0, activeScanCount - 1);
     }
   });
 

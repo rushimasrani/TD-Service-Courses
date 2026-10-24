@@ -136,6 +136,7 @@ const Footer: React.FC = () => {
                   <li><Link to="/resources" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Resources</Link></li>
                   <li><Link to="/careers" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Careers</Link></li>
                   <li><Link to="/contact" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Contact Us</Link></li>
+                  <li><Link to="/security-check" className="text-brand-400 hover:text-brand-300 text-sm transition-colors font-semibold flex items-center gap-1.5"><span>Free Security Check</span><ExternalLink size={12} /></Link></li>
                   <li><Link to="/privacy-policy" className="text-slate-400 hover:text-brand-500 text-sm transition-colors">Privacy Policy</Link></li>
                 </>
               )}

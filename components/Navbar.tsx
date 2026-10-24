@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronDown, ChevronRight, ExternalLink } from 'lucide-react';
 import { SERVICES } from '../constants';
 import Logo from './Logo';
-import { isAcademyDomain, getAcademyUrl, getMainSiteUrl, CrossDomainLink } from '../utils/domain';
+import { isAcademyDomain, isScannerDomain, getAcademyUrl, getMainSiteUrl, CrossDomainLink } from '../utils/domain';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,7 +12,10 @@ const Navbar: React.FC = () => {
   const [mobileNestedCourses, setMobileNestedCourses] = useState(false);
   const [mobileNestedCareerCourses, setMobileNestedCareerCourses] = useState(false);
   const location = useLocation();
-  const isAcademy = isAcademyDomain();
+
+  // Reactive domain detection synchronized with URL search parameter (?subdomain=...)
+  const isAcademy = isAcademyDomain(location.search);
+  const isScanner = isScannerDomain(location.search);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,20 +26,42 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu and sync scroll state on route change
+  // Close mobile menu and sync scroll state on route or query string change
   useEffect(() => {
     setIsOpen(false);
     setActiveDropdown(null);
-    setIsScrolled(window.scrollY > 20);
-  }, [location.pathname]);
+    const syncScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    syncScroll();
+    const timer = setTimeout(syncScroll, 50);
+    return () => clearTimeout(timer);
+  }, [location.pathname, location.search]);
 
-  // Route matching for light background sections (Courses and Trainings)
-  const isCoursesPage = location.pathname === '/courses' || location.pathname.startsWith('/courses/');
-  const isTrainingsPage = location.pathname === '/trainings' || location.pathname.startsWith('/trainings/');
-  const isLightPage = isCoursesPage || isTrainingsPage;
+  // Comprehensive route & subdomain check for light-background pages.
+  // On these pages, the background under the navbar is light (e.g. slate-50 / white),
+  // so the navbar MUST ALWAYS be solid white with dark readable text to prevent low-contrast invisibility:
+  // 1. Academy subdomain (academy.techdefends.com or ?subdomain=academy) -> root / and all training subpages
+  // 2. Scanner subdomain (php2shell.techdefends.com or ?subdomain=php2shell) -> root / and tool
+  // 3. Corporate Security Check page -> /security-check
+  // 4. All Courses, Trainings, and Internship routes -> /courses/*, /trainings/*, /internship
+  const isLightPage = (
+    isAcademy ||
+    isScanner ||
+    location.pathname === '/security-check' ||
+    location.pathname.startsWith('/security-check/') ||
+    location.pathname === '/courses' ||
+    location.pathname.startsWith('/courses/') ||
+    location.pathname === '/trainings' ||
+    location.pathname.startsWith('/trainings/') ||
+    location.pathname === '/internship' ||
+    location.pathname.startsWith('/internship/')
+  );
 
-  // Dynamic styles based on scroll, mobile menu, or light-themed page route
-  const isOpaque = isScrolled || isOpen || isLightPage;
+  // Dynamic styles based on scroll, mobile menu, or light-themed page route:
+  // - On light-themed pages & subdomains: isOpaque is ALWAYS true (guaranteeing dark readable text & solid bg).
+  // - On corporate homepage (and pages with dark hero banners): isOpaque is true only when scrolled or mobile menu is open.
+  const isOpaque = isLightPage || isScrolled || isOpen;
 
   const navBackground = isOpaque ? 'bg-white shadow-md' : 'bg-transparent';
   const navPadding = isScrolled ? 'py-2' : 'py-5';
@@ -53,7 +78,7 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0 flex items-center gap-3 group" aria-label={isAcademy ? "TechDefends Academy Home" : "TechDefends Home"}>
+          <Link to="/" className="flex-shrink-0 flex items-center gap-3 group" aria-label={isAcademy ? "TechDefends Academy Home" : (isScanner ? "TechDefends Security Check Home" : "TechDefends Home")}>
             <div className="transition-transform duration-300 group-hover:scale-105">
               <Logo size={40} className="shadow-sm" />
             </div>
@@ -411,6 +436,8 @@ const Navbar: React.FC = () => {
               <>
                 <Link to="/" onClick={() => setIsOpen(false)} className="block px-3 py-3 text-base font-medium text-slate-900 hover:text-brand-600 hover:bg-slate-50 rounded-md">Home</Link>
                 <Link to="/about" onClick={() => setIsOpen(false)} className="block px-3 py-3 text-base font-medium text-slate-900 hover:text-brand-600 hover:bg-slate-50 rounded-md">About Us</Link>
+                <Link to="/case-studies" onClick={() => setIsOpen(false)} className="block px-3 py-3 text-base font-medium text-slate-900 hover:text-brand-600 hover:bg-slate-50 rounded-md">Case Studies</Link>
+                <Link to="/resources" onClick={() => setIsOpen(false)} className="block px-3 py-3 text-base font-medium text-slate-900 hover:text-brand-600 hover:bg-slate-50 rounded-md">Resources</Link>
                 
                 <div className="space-y-1">
                   

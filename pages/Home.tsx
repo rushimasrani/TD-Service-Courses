@@ -2,15 +2,14 @@ import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useLocation } from 'react-router-dom';
 import { trackEvent } from '../utils/analytics';
-import { ArrowRight, CheckCircle, Shield, Activity, Users, Lock, ChevronRight, Clock, Award, Target } from 'lucide-react';
+import { ArrowRight, CheckCircle, Shield, Activity, Users, Lock, ChevronRight, Clock, Award, Target, Server, LayoutGrid, ShieldCheck } from 'lucide-react';
 import { SERVICES, MOCK_NEWS, MOCK_NEWS_POOL } from '../constants';
 import ServiceCard from '../components/ServiceCard';
 import HeroBackground from '../components/HeroBackground';
 import NewsCard from '../components/NewsCard';
 import { Reveal } from '../components/Reveal';
 import TechnologyEcosystem from '../components/TechnologyEcosystem';
-import { Server, GraduationCap, FileText, LayoutGrid, ShieldCheck } from 'lucide-react';
-import { CrossDomainLink } from '../utils/domain';
+import { CrossDomainLink, getScannerUrl } from '../utils/domain';
 
 
 const Home: React.FC = () => {
@@ -455,6 +454,37 @@ const Home: React.FC = () => {
                 </p>
               </div>
             </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* Website Security Scanner Promotional Callout */}
+      <section className="py-16 bg-slate-900 border-t border-slate-800 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="bg-slate-800/80 rounded-2xl border border-slate-700/80 p-8 sm:p-10 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div className="space-y-3 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-950/80 text-brand-400 border border-brand-800/60 uppercase tracking-wider">
+                <ShieldCheck size={14} className="text-brand-500" />
+                <span>Defensive Security Tool</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                Check Your Website Security
+              </h2>
+              <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+                Check publicly visible security indicators and PHP2Shell-related exposure signals for your website.
+              </p>
+            </div>
+
+            <div className="flex-shrink-0 w-full sm:w-auto">
+              <a
+                href={getScannerUrl()}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg transition-all duration-200 shadow-lg shadow-brand-900/40 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-slate-900 text-sm sm:text-base"
+                aria-label="Start Security Check"
+              >
+                <span>Start Security Check</span>
+                <ArrowRight size={18} />
+              </a>
+            </div>
           </div>
         </div>
       </section>

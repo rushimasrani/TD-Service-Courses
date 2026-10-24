@@ -4,8 +4,9 @@ import { Link, LinkProps } from 'react-router-dom';
 /**
  * Domain configuration constants
  */
-export const MAIN_DOMAIN = import.meta.env.VITE_MAIN_DOMAIN || 'https://techdefends.com';
-export const ACADEMY_DOMAIN = import.meta.env.VITE_ACADEMY_DOMAIN || 'https://academy.techdefends.com';
+export const MAIN_DOMAIN = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_MAIN_DOMAIN) || (typeof process !== 'undefined' && process.env?.VITE_MAIN_DOMAIN) || 'https://techdefends.com';
+export const ACADEMY_DOMAIN = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_ACADEMY_DOMAIN) || (typeof process !== 'undefined' && process.env?.VITE_ACADEMY_DOMAIN) || 'https://academy.techdefends.com';
+export const SCANNER_DOMAIN = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_SCANNER_DOMAIN) || (typeof process !== 'undefined' && process.env?.VITE_SCANNER_DOMAIN) || 'https://php2shell.techdefends.com';
 
 /**
  * Determines if the current environment is local development or an AI Studio preview sandbox.
@@ -27,22 +28,65 @@ export function isDevEnvironment(): boolean {
  * Checks if the user is currently browsing the Academy subdomain.
  * Supports URL parameter `?subdomain=academy` for dev/preview simulation.
  */
-export function isAcademyDomain(): boolean {
-  if (typeof window === 'undefined') return false;
-  const hostname = window.location.hostname.toLowerCase();
-  
-  // Real Academy hostname
-  if (hostname === 'academy.techdefends.com' || hostname.startsWith('academy.')) {
-    return true;
+export function isAcademyDomain(search?: string): boolean {
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname.toLowerCase();
+    // Real Academy hostname
+    if (hostname === 'academy.techdefends.com' || hostname.startsWith('academy.')) {
+      return true;
+    }
   }
   
   // Simulation parameter for testing in local/preview environments
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('subdomain') === 'academy') {
-    return true;
+  const query = search !== undefined ? search : (typeof window !== 'undefined' ? window.location.search : '');
+  if (query) {
+    const params = new URLSearchParams(query);
+    if (params.get('subdomain') === 'academy') {
+      return true;
+    }
   }
 
   return false;
+}
+
+/**
+ * Checks if the user is currently browsing the PHP2Shell scanner subdomain.
+ * Supports URL parameter `?subdomain=php2shell` for dev/preview simulation.
+ */
+export function isScannerDomain(search?: string): boolean {
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname.toLowerCase();
+    // Real scanner hostname
+    if (hostname === 'php2shell.techdefends.com' || hostname.startsWith('php2shell.')) {
+      return true;
+    }
+  }
+  
+  // Simulation parameter for testing in local/preview environments
+  const query = search !== undefined ? search : (typeof window !== 'undefined' ? window.location.search : '');
+  if (query) {
+    const params = new URLSearchParams(query);
+    if (params.get('subdomain') === 'php2shell') {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Resolves a URL for the PHP2Shell Scanner.
+ * In development/preview: returns relative path "/?subdomain=php2shell".
+ * In production: returns absolute URL "https://php2shell.techdefends.com/".
+ */
+export function getScannerUrl(path: string = '/'): string {
+  if (isDevEnvironment()) {
+    // In dev / preview, keep navigation inside current preview environment using simulation query
+    return '/?subdomain=php2shell';
+  }
+
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return `${SCANNER_DOMAIN.replace(/\/+$/, '')}${normalizedPath}`;
 }
 
 /**
